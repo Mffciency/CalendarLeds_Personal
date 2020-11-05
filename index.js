@@ -23,13 +23,13 @@ const calendar = google.calendar({ version: 'v3', auth: oAuth2Client })
 var hourmod = 0
 var nrLeds = 144
 var baseColor = [0,0,0] //[4,8,0]
-var appointmentColor = [4,0,16]
-var amColor = [8,8,0]
+var hourColor = [4,2,8]
+var hour3Color = [12,16,12]
 var hour12Color = [30,30,30]
-var hour3Color = [12,12,12]
-var hourColor = [4,4,8]
 var sleepColor = [0,0,0]
 var nowColor = [0,20,0]
+var appointmentColor = [4,0,16]
+var amColor = [8,8,0]
 var pastDiv = 4
 var datatimes = []
 var LedSequence = []
@@ -40,16 +40,37 @@ Date.prototype.addHours = function (h) {
   return this;
 }
 
+function updateVars(){
+  nrLeds = process.env.nrLeds;
+  baseColor = process.env.baseColor;
+  hourColor = process.env.hourColor;
+  hour3Color = process.env.hour3Color;
+  hour12Color = process.env.hour12Color;
+  sleepColor = process.env.sleepColor;
+  nowColor = process.env.nowColor;
+  appointmentColor = process.env.appointmentColor;
+  amColor = process.env.amColor;
+  pastDiv = process.env.pastDiv;
+}
+
 function print(text){
  if(showPrint){
    console.log(text);}
 
 }
 
-async function prep(calendarId) {
-  //
-  
-  
+async function createBlank(){
+  //empty ledsequence
+  LedSequence = []
+
+  // create an array with 144 unlit LEDs
+  for (let index = 0; index < nrLeds; index++) {
+    LedSequence.push([0,0,0])
+  }
+  // console.log("ledstart: ", LedSequence)
+}
+
+async function prep(calendarId) {  
   // set start of today
   const start = new Date();
   start.setHours(0, 0, 0, 0);
@@ -159,16 +180,7 @@ function timeToLedpos ([hour,min], down=false){
   return ledPos;
 }
 
-async function createBlank(){
-  //empty ledsequence
-  LedSequence = []
 
-  // create an array with 144 unlit LEDs
-  for (let index = 0; index < nrLeds; index++) {
-    LedSequence.push([0,0,0])
-  }
-  // console.log("ledstart: ", LedSequence)
-}
 
 async function putAppointment (datetimesIn,color){
   // pushing the appointements to the led array
@@ -253,6 +265,8 @@ async function dimPast (){
       // console.log("before:",LedSequence[pos]);
       //let newvar = [0,0,0]
       //console.log("newvar:",newvar);
+      let firstchar = Math.round((LedSequence[pos][0])/pastDiv);
+      console.log(firstchar);
       let newvar = [Math.round((LedSequence[pos][0])/pastDiv),Math.round((LedSequence[pos][1])/pastDiv),Math.round((LedSequence[pos][2])/pastDiv)];
       // console.log("newvar:",newvar);
       LedSequence[pos]=newvar;
@@ -272,13 +286,11 @@ async function shiftOne (){
 
 async function getLeds1(hourshift) {
   hourmod = hourshift;
+  if (hourshift !=0){updateVars();}
   // first create a blank array
   await createBlank();
   // then get the data
   await prep(calId);
-  
-  
-  //console.log(("datatimes: ", datatimes))
   await putAppointment(datatimes,appointmentColor);
   await prep(calId2);
   await putAppointment(datatimes,amColor);
@@ -287,14 +299,54 @@ async function getLeds1(hourshift) {
   await dimPast();
   await shiftOne();
   console.log("ledexport: ")
-  console.log("export: ", LedSequence)
+  // console.log("export: ", LedSequence)
   if (hourshift !=0){LedSequence.forEach(e => console.log(e))}
   
   return{LedSequence}
 }
 
 
-getLeds1(0)
-// exports.getLeds1 = async function(req, res){
-//     res.status(200).send(await getLeds1(-1));
-// }
+// getLeds1(0)
+exports.getLeds1 = async function(req, res){
+  let nrLeds = req.query.nrLeds || req.body.nrLeds ;
+  let baseColor = req.query.baseColor || req.body.baseColor ;
+  let hourColor = req.query.hourColor || req.body.hourColor ;
+  let hour3Color = req.query.hour3Color || req.body.hour3Color ;
+  let hour12Color = req.query.hour12Color || req.body.hour12Color ;
+  let sleepColor = req.query.sleepColor || req.body.sleepColor ;
+  let nowColor = req.query.nowColor || req.body.nowColor ;
+  let appointmentColor = req.query.appointmentColor || req.body.appointmentColor ;
+  let amColor = req.query.amColor || req.body.amColor ;
+  let pastDiv = req.query.pastDiv || req.body.pastDiv ;
+  if (nrLeds){
+    process.env.nrLeds=nrLeds;
+  }
+  if (baseColor){
+    process.env.baseColor=baseColor;
+  }
+  if (hourColor){
+    process.env.hourColor=hourColor;
+  }
+  if (hour3Color){
+    process.env.hour3Color=hour3Color;
+  }
+  if (hour12Color){
+    process.env.hour12Color=hour12Color;
+  }
+  if (sleepColor){
+    process.env.sleepColor=sleepColor;
+  }
+  if (nowColor){
+    process.env.nowColor=nowColor;
+  }
+  if (appointmentColor){
+    process.env.appointmentColor=appointmentColor;
+  }
+  if (amColor){
+    process.env.amColor=amColor;
+  }
+  if (pastDiv){
+    process.env.pastDiv=pastDiv;
+  }
+  res.status(200).send(await getLeds1(-1));
+}
