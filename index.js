@@ -27,7 +27,7 @@ var appointmentColor = [4,0,16]
 var amColor = [8,8,0]
 var hour12Color = [30,30,30]
 var hour3Color = [12,12,12]
-var hourColor = [4,4,4]
+var hourColor = [4,4,8]
 var sleepColor = [0,0,0]
 var nowColor = [0,20,0]
 var pastDiv = 4
@@ -152,10 +152,10 @@ function timeToLedpos ([hour,min], down=false){
   }
   
   var ledPos = hour*6+deciMin;
-  console.log("-----------------------")
-  console.log("info:")
-  console.log(hour, min, deciMin, ledPos);
-  console.log("-----------------------")
+  // console.log("-----------------------")
+  // console.log("info:")
+  // console.log(hour, min, deciMin, ledPos);
+  // console.log("-----------------------")
   return ledPos;
 }
 
@@ -173,8 +173,9 @@ async function createBlank(){
 async function putAppointment (datetimesIn,color){
   // pushing the appointements to the led array
   console.log("pushing appointments:")
+  // console.log("dates in:",datetimesIn,"color:",color)
   datetimesIn.forEach(element => {
-    console.log(element);
+    // console.log(element);
     for (let index=element[0]; index < element[1]; index++){
       LedSequence[index]=color;
       // console.log(element);
@@ -205,19 +206,19 @@ async function overlayHours (){
     }
     else if (pos < 42){
       // if sleeping
-      if (LedSequence[pos]!=appointmentColor){
+      if (LedSequence[pos]!=appointmentColor && LedSequence[pos]!=amColor){
         LedSequence[pos]=sleepColor;
       }
     }
     else if (pos > 138){
       // if sleeping
-      if (LedSequence[pos]!=appointmentColor){
+      if (LedSequence[pos]!=appointmentColor && LedSequence[pos]!=amColor){
         LedSequence[pos]=sleepColor;
       }
     }
     else{
       // basecolor
-      if (LedSequence[pos]!=appointmentColor){
+      if (LedSequence[pos]!=appointmentColor && LedSequence[pos]!=amColor){
         LedSequence[pos]=baseColor;
       }
     }
@@ -234,7 +235,7 @@ function addZero(i) {
 
 async function dimPast (){
   console.log("dim past");
-  // console.log(LedSequence);
+  console.log(LedSequence);
   var now = new Date();
   now.addHours(1);
   var h = addZero(now.getHours());
@@ -286,6 +287,7 @@ async function getLeds1(hourshift) {
   await dimPast();
   await shiftOne();
   console.log("ledexport: ")
+  console.log("export: ", LedSequence)
   if (hourshift !=0){LedSequence.forEach(e => console.log(e))}
   
   return{LedSequence}
