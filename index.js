@@ -10,6 +10,7 @@ const clientSecret = require('./login.json').clientSecret;
 const refreshToken = require('./login.json').refreshToken;
 const calId = require('./login.json').PriveCalendar;
 const calId2 = require('./login.json').am;
+const calId3 = require('./login.json').ab;
 
 
 
@@ -30,6 +31,7 @@ var sleepColor = [0, 0, 0]
 var nowColor = [0, 20, 0]
 var appointmentColor = [4, 0, 16]
 var amColor = [8, 8, 0]
+var abColor = [0,4,8]
 var pastDiv = 4
 var datatimes = []
 var LedSequence = []
@@ -55,6 +57,7 @@ function updateVars() {
   nowColor = JSON.parse(process.env.nowColor);
   appointmentColor = JSON.parse(process.env.appointmentColor);
   amColor = JSON.parse(process.env.amColor);
+  abColor = JSON.parse(process.env.abColor);
   pastDiv = process.env.pastDiv;
   if (show) {
     console.log("before : nrLeds:", nrLeds, "baseColor:", baseColor, typeof baseColor, "hourColor:", hourColor, "hour3Color:", hour3Color, "hour12Color:", hour12Color, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appointmentColor, "amColor:", amColor, "pastDiv:", pastDiv)
@@ -194,7 +197,7 @@ function timeToLedpos([hour, min], down = false) {
 async function putAppointment(datetimesIn, color) {
   // pushing the appointements to the led array
   console.log("pushing appointments:")
-  // console.log("dates in:",datetimesIn,"color:",color)
+  console.log("dates in:",datetimesIn,"color:",color)
   datetimesIn.forEach(element => {
     // console.log(element);
     for (let index = element[0]; index < element[1]; index++) {
@@ -227,19 +230,19 @@ async function overlayHours() {
     }
     else if (pos < 42) {
       // if sleeping
-      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor) {
+      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor&& LedSequence[pos] != abColor) {
         LedSequence[pos] = sleepColor;
       }
     }
     else if (pos > 138) {
       // if sleeping
-      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor) {
+      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor&& LedSequence[pos] != abColor) {
         LedSequence[pos] = sleepColor;
       }
     }
     else {
       // basecolor
-      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor) {
+      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor&& LedSequence[pos] != abColor) {
         LedSequence[pos] = baseColor;
       }
     }
@@ -256,7 +259,7 @@ function addZero(i) {
 
 async function dimPast() {
   console.log("dim past");
-  console.log(LedSequence);
+  // console.log(LedSequence);
   var now = new Date();
   now.addHours(1);
   var h = addZero(now.getHours());
@@ -274,8 +277,7 @@ async function dimPast() {
       // console.log("before:",LedSequence[pos]);
       //let newvar = [0,0,0]
       //console.log("newvar:",newvar);
-      let firstchar = Math.round((LedSequence[pos][0]) / pastDiv);
-      console.log("ledpos:", LedSequence[pos][0], "div:", pastDiv, "firstchar:", firstchar);
+      // console.log("ledpos:", LedSequence[pos][0], "div:", pastDiv);
       let newvar = [Math.round((LedSequence[pos][0]) / pastDiv), Math.round((LedSequence[pos][1]) / pastDiv), Math.round((LedSequence[pos][2]) / pastDiv)];
       // console.log("newvar:",newvar);
       LedSequence[pos] = newvar;
@@ -301,14 +303,18 @@ async function getLeds1(hourshift) {
   // then get the data
   await prep(calId);
   await putAppointment(datatimes, appointmentColor);
+  console.log("cal1: ", LedSequence)
   await prep(calId2);
   await putAppointment(datatimes, amColor);
-  // console.log("export: ", LedSequence)
+  console.log("cal2: ", LedSequence)
+  await prep(calId3);
+  await putAppointment(datatimes, abColor);
+  console.log("cal3: ", LedSequence)
   await overlayHours();
   await dimPast();
   await shiftOne();
   console.log("ledexport: ")
-  // console.log("export: ", LedSequence)
+  console.log("export: ", LedSequence)
   if (hourshift != 0) { LedSequence.forEach(e => console.log(e)) }
 
   return { LedSequence }
@@ -326,6 +332,7 @@ exports.getLeds1 = async function (req, res) {
   let nowColor = req.query.nowColor || req.body.nowColor;
   let appointmentColor = req.query.appointmentColor || req.body.appointmentColor;
   let amColor = req.query.amColor || req.body.amColor;
+  let abColor = req.query.abColor || req.body.abColor;
   let pastDiv = req.query.pastDiv || req.body.pastDiv;
   if (nrLeds) {
     process.env.nrLeds = nrLeds;
@@ -353,6 +360,9 @@ exports.getLeds1 = async function (req, res) {
   }
   if (amColor) {
     process.env.amColor = amColor;
+  }
+  if (abColor) {
+    process.env.abColor = abColor;
   }
   if (pastDiv) {
     process.env.pastDiv = pastDiv;
