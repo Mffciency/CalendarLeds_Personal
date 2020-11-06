@@ -1,4 +1,20 @@
-// tutorial: https://www.youtube.com/watch?v=zrLf4KMs71E
+/* calendar api tutorial: https://www.youtube.com/watch?v=zrLf4KMs71E
+
+how does it work:
+it reads your google calendar and returns for each led an RGB value
+
+led #1 = 00:10 - 00:19 > this is so you can have a bright led at the end of the ledstrip indicating "the end of the day"
+led #2 = 00:20 - 00:29
+...
+led #144 = 00:00 - 00:09 
+
+
+TODO: 
+- link between google source and github
+- add more documentation
+- cleanup code
+
+*/
 
 const { google } = require('googleapis')
 const { oauth2 } = require('googleapis/build/src/apis/oauth2')
@@ -12,6 +28,11 @@ const calId = require('./login.json').PriveCalendar;
 const calId2 = require('./login.json').am;
 const calId3 = require('./login.json').ab;
 
+/* for adding a new calendar, make sure:
+- you update the login file in the google cloud environment
+- you add exceptions to the overlayhours function
+
+*/
 
 
 const oAuth2Client = new OAuth2(clientId, clientSecret)
@@ -21,18 +42,18 @@ oAuth2Client.setCredentials({ refresh_token: refreshToken })
 const calendar = google.calendar({ version: 'v3', auth: oAuth2Client })
 
 // set up global variables
-var hourmod = 0
-var nrLeds = 144
-var baseColor = [0, 0, 0] //[4,8,0]
-var hourColor = [4, 2, 8]
-var hour3Color = [12, 16, 12]
-var hour12Color = [30, 30, 30]
-var sleepColor = [0, 0, 0]
-var nowColor = [0, 20, 0]
-var appointmentColor = [4, 0, 16]
-var amColor = [8, 8, 0]
-var abColor = [0,4,8]
-var pastDiv = 4
+var hourmod = 0 // if your pc has a different timezone than the google cloud
+var nrLeds = 144 // the amount of leds in your ledstrip
+var baseColor = [0, 0, 0] // the background color
+var hourColor = [4, 2, 8] // the color of the hour indications
+var hour3Color = [12, 16, 12] // the color of the hours divisible by 3
+var hour12Color = [30, 30, 30] // the color of the hours divisible by 12
+var sleepColor = [0, 0, 0] // the color of the leds before 7hr and after 23hr
+var nowColor = [0, 20, 0] // the color of the led indicating the current time
+var appointmentColor = [4, 0, 16] // the color of the appointments of the first calendar
+var amColor = [8, 8, 0] // the color of the appointments of the second calendar
+var abColor = [0, 4, 8] // the color of the appointments of the third calendar
+var pastDiv = 4 // you divide the brightness of the leds in the past by this amount
 var datatimes = []
 var LedSequence = []
 var showPrint = true;
@@ -43,7 +64,7 @@ Date.prototype.addHours = function (h) {
 }
 
 function updateVars() {
-  var show = 1 ;
+  var show = 1;
   console.log("updating vars")
   if (show) {
     console.log("before : nrLeds:", nrLeds, "baseColor:", baseColor, typeof baseColor, "hourColor:", hourColor, "hour3Color:", hour3Color, "hour12Color:", hour12Color, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appointmentColor, "amColor:", amColor, "pastDiv:", pastDiv)
@@ -192,12 +213,10 @@ function timeToLedpos([hour, min], down = false) {
   return ledPos;
 }
 
-
-
 async function putAppointment(datetimesIn, color) {
   // pushing the appointements to the led array
   console.log("pushing appointments:")
-  console.log("dates in:",datetimesIn,"color:",color)
+  console.log("dates in:", datetimesIn, "color:", color)
   datetimesIn.forEach(element => {
     // console.log(element);
     for (let index = element[0]; index < element[1]; index++) {
@@ -230,19 +249,19 @@ async function overlayHours() {
     }
     else if (pos < 42) {
       // if sleeping
-      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor&& LedSequence[pos] != abColor) {
+      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor && LedSequence[pos] != abColor) {
         LedSequence[pos] = sleepColor;
       }
     }
     else if (pos > 138) {
       // if sleeping
-      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor&& LedSequence[pos] != abColor) {
+      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor && LedSequence[pos] != abColor) {
         LedSequence[pos] = sleepColor;
       }
     }
     else {
       // basecolor
-      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor&& LedSequence[pos] != abColor) {
+      if (LedSequence[pos] != appointmentColor && LedSequence[pos] != amColor && LedSequence[pos] != abColor) {
         LedSequence[pos] = baseColor;
       }
     }
@@ -296,32 +315,51 @@ async function shiftOne() {
 }
 
 async function getLeds1(hourshift) {
+  // to offset the timedifference of the google cloud
   hourmod = hourshift;
-  if (hourshift != 0) { updateVars(); }
+  if (hourshift != 0) {
+    // if this is running in the cloud then take the cloud variables
+    updateVars();
+  }
   // first create a blank array
   await createBlank();
+
   // then get the data
-  await prep(calId);
-  await putAppointment(datatimes, appointmentColor);
-  console.log("cal1: ", LedSequence)
-  await prep(calId2);
-  await putAppointment(datatimes, amColor);
-  console.log("cal2: ", LedSequence)
+  // the order in which the calendars get called dictates which one gets overwritten
+
   await prep(calId3);
   await putAppointment(datatimes, abColor);
-  console.log("cal3: ", LedSequence)
+  // console.log("cal3: ", LedSequence)
+
+  await prep(calId2);
+  await putAppointment(datatimes, amColor);
+  // console.log("cal2: ", LedSequence)
+
+  await prep(calId);
+  await putAppointment(datatimes, appointmentColor);
+  // console.log("cal1: ", LedSequence)
+
+  // overlay the hours of the day over the array
   await overlayHours();
+
+  // dim all the leds in the past + highlight the current led
   await dimPast();
+
+  // it allows to have a 12hr led at the end of the ledstrip
   await shiftOne();
+
+  // for debug reasons
   console.log("ledexport: ")
-  console.log("export: ", LedSequence)
+  // console.log("export: ", LedSequence)
   if (hourshift != 0) { LedSequence.forEach(e => console.log(e)) }
 
   return { LedSequence }
 }
 
 
-// getLeds1(0)
+// getLeds1(0) // > use this to debug on your device
+
+// use below in google cloud
 exports.getLeds1 = async function (req, res) {
   let nrLeds = req.query.nrLeds || req.body.nrLeds;
   let baseColor = req.query.baseColor || req.body.baseColor;
