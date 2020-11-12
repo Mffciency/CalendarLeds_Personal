@@ -44,16 +44,17 @@ const calendar = google.calendar({ version: 'v3', auth: oAuth2Client })
 // set up global variables
 var hourmod = 0 // if your pc has a different timezone than the google cloud
 var nrLeds = 144 // the amount of leds in your ledstrip
-var baseColor = [0, 0, 0] // the background color
-var hourColor = [4, 2, 8] // the color of the hour indications
-var hour3Color = [12, 16, 12] // the color of the hours divisible by 3
-var hour12Color = [30, 30, 30] // the color of the hours divisible by 12
-var sleepColor = [0, 0, 0] // the color of the leds before 7hr and after 23hr
-var nowColor = [0, 20, 0] // the color of the led indicating the current time
-var appointmentColor = [4, 0, 16] // the color of the appointments of the first calendar
-var amColor = [8, 8, 0] // the color of the appointments of the second calendar
-var abColor = [0, 4, 8] // the color of the appointments of the third calendar
+var baseColor = [0, 0, 0]//[0, 0, 0] // the background color
+var hourColor = [0, 0, 0]//[4, 2, 8] // the color of the hour indications
+var hour3Color = [0, 0, 0]//[12, 16, 12] // the color of the hours divisible by 3
+var hour12Color = [0, 0, 0]//[30, 30, 30] // the color of the hours divisible by 12
+var sleepColor = [0, 0, 0]//[0, 0, 0] // the color of the leds before 7hr and after 23hr
+var nowColor = [0, 0, 0]//[0, 20, 0] // the color of the led indicating the current time
+var appointmentColor = [0, 0, 0]//[4, 0, 16] // the color of the appointments of the first calendar
+var amColor = [0, 0, 0]//[8, 8, 0] // the color of the appointments of the second calendar
+var abColor = [0, 0, 0]//[0, 4, 8] // the color of the appointments of the third calendar
 var pastDiv = 4 // you divide the brightness of the leds in the past by this amount
+var refreshRate = 1 //de divider of the refreshrate of the arduino
 var datatimes = []
 var LedSequence = []
 var showPrint = true;
@@ -61,6 +62,20 @@ var showPrint = true;
 Date.prototype.addHours = function (h) {
   this.setTime(this.getTime() + (h * 60 * 60 * 1000));
   return this;
+}
+
+function onSelfReset(){
+  nrLeds = 144;
+  baseColor = [0, 0, 0];
+  hourColor = [0, 0, 0];
+  hour3Color = [0, 0, 0];
+  hour12Color = [0, 0, 0];
+  sleepColor = [0, 0, 0];
+  nowColor = [0, 0, 0];
+  appointmentColor = [0, 0, 0];
+  amColor = [0, 0, 0];
+  abColor = [0, 0, 0];
+  pastDiv = 4;
 }
 
 function updateVars() {
