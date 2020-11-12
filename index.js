@@ -55,6 +55,7 @@ var amColor = [0, 0, 0]//[8, 8, 0] // the color of the appointments of the secon
 var abColor = [0, 0, 0]//[0, 4, 8] // the color of the appointments of the third calendar
 var pastDiv = 4 // you divide the brightness of the leds in the past by this amount
 var refreshRate = 1 //de divider of the refreshrate of the arduino
+var website = "www.google.com"
 var datatimes = []
 var LedSequence = []
 var showPrint = true;
@@ -368,7 +369,7 @@ async function getLeds1(hourshift) {
   // console.log("export: ", LedSequence)
   if (hourshift != 0) { LedSequence.forEach(e => console.log(e)) }
 
-  return { LedSequence }
+  return { LedSequence, refreshRate, website }
 }
 
 

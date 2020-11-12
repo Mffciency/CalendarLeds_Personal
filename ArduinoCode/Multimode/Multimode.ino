@@ -3,7 +3,7 @@ To remember: always save modifications!
 Todo: 
 - add local webpage to cycle between modes
 - show future/previous days
-- show temparature/cloudcoverage
+- show temperature/cloudcoverage
 - show sunrise/sunset
 - discomode
 - animate on phone notification
@@ -42,7 +42,7 @@ WifiLib tel(true);
 
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
-const char * = tel.getSite(1);
+const char *website = tel.getSite(1);
 
 // json conversion setup
 uint8_t Ary[432];
@@ -69,14 +69,14 @@ void Print(String text)
   }
 }
 
-void getLedSequence()
+void CallWebsite()
 {
   // call the website to get an array of RGB values in return
 
   if (WiFi.status() == WL_CONNECTED)
   {                         //Check WiFi connection status
     HTTPClient http;        //Declare an object of class HTTPClient
-    http.begin(website_01); //Specify request destination
+    http.begin(website); //Specify request destination
 
     PrintLn("reaching site");
     int httpCode = http.GET(); //Send the request
@@ -87,7 +87,7 @@ void getLedSequence()
       PrintLn(payload);
 
       PrintLn("payload above"); //Print the response payload
-      getJson(payload);
+      StringToJson(payload);
     }
     else
     {
@@ -99,23 +99,25 @@ void getLedSequence()
   }
 }
 
-void getJson(String textIn)
+void StringToJson(String textIn)
 {
   // convert the string into a json document.
-  DynamicJsonDocument doc(9999);
+  DynamicJsonDocument doc(13999);
   deserializeJson(doc, textIn);
   JsonObject obj = doc.as<JsonObject>();
-  lightString(obj);
+  JsonToFastled(obj);
+  JsonToRefreshRate(obj);
+  JsonToWebsite(obj);
 }
 
-void lightString(JsonObject serie)
+void JsonToFastled(JsonObject obj)
 {
   // put the values of the json document into the ledstring
   for (int i = 0; i < 144; i++)
   {
-    int R = serie[String("LedSequence")][i][0];
-    int G = serie[String("LedSequence")][i][1];
-    int B = serie[String("LedSequence")][i][2];
+    int R = obj[String("LedSequence")][i][0];
+    int G = obj[String("LedSequence")][i][1];
+    int B = obj[String("LedSequence")][i][2];
     leds[i] = CRGB(R, G, B);
     Print(String(R));
     Print(String(G));
@@ -123,6 +125,14 @@ void lightString(JsonObject serie)
     FastLED.show();
     delay(30);
   }
+}
+
+void JsonToRefreshRate(JsonObject obj){
+  refreshRate = obj[String("refreshRate")];
+}
+
+void JsonToWebsite(JsonObject obj){
+  website = obj[String("website")];
 }
 
 void setup()
@@ -153,12 +163,12 @@ void setup()
   FastLED.show();
 
   // do a first call to the website to get the led sequence
-  getLedSequence();
+  CallWebsite();
 }
 
 void loop()
 {
 
   delay(60000/refreshRate); //Send a request every 60 seconds
-  getLedSequence();
+  CallWebsite();
 }
