@@ -27,7 +27,7 @@ FASTLED_USING_NAMESPACE
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
-#define DATA_PIN    5
+#define DATA_PIN 5
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS 144
@@ -38,16 +38,29 @@ const int LOWBRIGHTNESS = BRIGHTNESS - 45;
 const int HIGHBRIGHTNESS = BRIGHTNESS + 80;
 #define FRAMES_PER_SECOND 60
 
+uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+
 // Wifi setup
 WifiLib tel(true);
 
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
 const char *website = tel.getSite(1);
+const int mode = tel.getMode();
 const char *token = tel.getToken();
 
 String useWebsite = String(website);
 String useToken = String(token);
+
+// Different modes
+int useMode = mode;
+/*
+1 : show set slowly
+2 : show set instant
+3 : hartbeat
+4 : flash between set of colors
+5 : update one led, no reset
+*/
 
 // json conversion setup
 uint8_t Ary[432];
@@ -66,6 +79,7 @@ void PrintLn(String text)
     Serial.println(text);
   }
 }
+
 void Print(String text)
 {
   if (showUpdates)
@@ -79,8 +93,8 @@ void CallWebsite()
   // call the website to get an array of RGB values in return
 
   if (WiFi.status() == WL_CONNECTED)
-  {                         //Check WiFi connection status
-    HTTPClient http;        //Declare an object of class HTTPClient
+  {                  //Check WiFi connection status
+    HTTPClient http; //Declare an object of class HTTPClient
     String call = String(useWebsite) + "?token=" + String(token);
     PrintLn(String(call));
     http.begin(call); //Specify request destination
@@ -112,6 +126,7 @@ void StringToJson(String textIn)
   DynamicJsonDocument doc(13999);
   deserializeJson(doc, textIn);
   JsonObject obj = doc.as<JsonObject>();
+  JsonToMode(obj);
   JsonToFastled(obj);
   JsonToRefreshRate(obj);
   JsonToWebsite(obj);
@@ -120,6 +135,52 @@ void StringToJson(String textIn)
 void JsonToFastled(JsonObject obj)
 {
   // put the values of the json document into the ledstring
+  if (useMode == 3)
+  {
+    return;
+  }
+  if (useMode == 4)
+  {
+    
+    JsonArray array = obj[String("LedSequence")];
+    int arraysize = array.size();
+    Serial.println(array.size()); // 2
+    for (int i = 0; i < arraysize; i++)
+    {
+      int R = obj[String("LedSequence")][i][0];
+      int G = obj[String("LedSequence")][i][1];
+      int B = obj[String("LedSequence")][i][2];
+      fill_solid(leds, NUM_LEDS, CRGB(R, G, B));
+      FastLED.show();
+      Serial.print("leds:");
+      Serial.print(leds[0]);
+      Serial.print(leds[1]);
+      Serial.print(leds[2]);
+      Serial.print(leds[143]);
+      Serial.println(leds[144]);
+      delay(50);
+    }  
+    
+    return;
+  }
+  if (useMode == 5)
+  {
+      int pos = obj[String("LedSequence")][0][0];
+      int R = obj[String("LedSequence")][1][0];
+      int G = obj[String("LedSequence")][1][1];
+      int B = obj[String("LedSequence")][1][2];
+      leds[pos] = CRGB(R, G, B);
+      FastLED.show();
+      Serial.print("leds:");
+      Serial.print(leds[0]);
+      Serial.print(leds[1]);
+      Serial.print(leds[2]);
+      Serial.print(leds[143]);
+      Serial.println(leds[144]);
+      
+    
+    return;
+  }
   for (int i = 0; i < 144; i++)
   {
     int R = obj[String("LedSequence")][i][0];
@@ -129,23 +190,56 @@ void JsonToFastled(JsonObject obj)
     //Print(String(R));
     //Print(String(G));
     //PrintLn(String(B));
-    FastLED.show();
-    delay(30);
+    if (useMode == 1 || useMode == 0)
+    {
+      FastLED.show();
+      delay(30);
+    }
   }
+  if (useMode == 2)
+  {
+    FastLED.show();
+  }
+  Serial.print("leds:");
+  Serial.print(leds[0]);
+  Serial.print(leds[1]);
+  Serial.print(leds[2]);
+  Serial.print(leds[143]);
+  Serial.println(leds[144]);
 }
 
-void JsonToRefreshRate(JsonObject obj){
+void JsonToRefreshRate(JsonObject obj)
+{
   refreshRate = obj[String("refreshRate")];
   Print("refreshrate: ");
   PrintLn(String(refreshRate));
 }
 
-void JsonToWebsite(JsonObject obj){
+void JsonToWebsite(JsonObject obj)
+{
   useWebsite = obj[String("website")].as<String>();
   Print("website: ");
   PrintLn(useWebsite);
 }
 
+void JsonToMode(JsonObject obj)
+{
+  useMode = obj[String("mode")];
+  Print("mode: ");
+  PrintLn(String(useMode));
+}
+
+void bpm()
+{
+  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+  uint8_t BeatsPerMinute = 62;
+  CRGBPalette16 palette = PartyColors_p;
+  uint8_t beat = beatsin8(BeatsPerMinute, 64, 255);
+  for (int i = 0; i < NUM_LEDS; i++)
+  { //9948
+    leds[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
+  }
+}
 void setup()
 {
   // setup leds
@@ -179,7 +273,11 @@ void setup()
 
 void loop()
 {
-
-  delay(60000/refreshRate); //Send a request every 60 seconds
+  delay(60000 / refreshRate); //Send a request every 60 seconds
+  if (useMode == 3)
+  {
+    
+    bpm();
+  }
   CallWebsite();
 }
