@@ -27,6 +27,7 @@ const refreshToken = require('./login.json').refreshToken;
 const calId = require('./login.json').PriveCalendar;
 const calId2 = require('./login.json').am;
 const calId3 = require('./login.json').ab;
+const accessToken = require('./login.json').at;
 
 /* for adding a new calendar, make sure:
 - you update the login file in the google cloud environment
@@ -377,49 +378,56 @@ async function getLeds1(hourshift) {
 
 // use below in google cloud
 exports.getLeds1 = async function (req, res) {
-  let nrLeds = req.query.nrLeds || req.body.nrLeds;
-  let baseColor = req.query.baseColor || req.body.baseColor;
-  let hourColor = req.query.hourColor || req.body.hourColor;
-  let hour3Color = req.query.hour3Color || req.body.hour3Color;
-  let hour12Color = req.query.hour12Color || req.body.hour12Color;
-  let sleepColor = req.query.sleepColor || req.body.sleepColor;
-  let nowColor = req.query.nowColor || req.body.nowColor;
-  let appointmentColor = req.query.appointmentColor || req.body.appointmentColor;
-  let amColor = req.query.amColor || req.body.amColor;
-  let abColor = req.query.abColor || req.body.abColor;
-  let pastDiv = req.query.pastDiv || req.body.pastDiv;
-  if (nrLeds) {
-    process.env.nrLeds = nrLeds;
+  let atok = req.query.token;
+  if (atok == accessToken){
+    let nrLeds = req.query.nrLeds || req.body.nrLeds;
+    let baseColor = req.query.baseColor || req.body.baseColor;
+    let hourColor = req.query.hourColor || req.body.hourColor;
+    let hour3Color = req.query.hour3Color || req.body.hour3Color;
+    let hour12Color = req.query.hour12Color || req.body.hour12Color;
+    let sleepColor = req.query.sleepColor || req.body.sleepColor;
+    let nowColor = req.query.nowColor || req.body.nowColor;
+    let appointmentColor = req.query.appointmentColor || req.body.appointmentColor;
+    let amColor = req.query.amColor || req.body.amColor;
+    let abColor = req.query.abColor || req.body.abColor;
+    let pastDiv = req.query.pastDiv || req.body.pastDiv;
+    if (nrLeds) {
+      process.env.nrLeds = nrLeds;
+    }
+    if (baseColor) {
+      process.env.baseColor = baseColor;
+    }
+    if (hourColor) {
+      process.env.hourColor = hourColor;
+    }
+    if (hour3Color) {
+      process.env.hour3Color = hour3Color;
+    }
+    if (hour12Color) {
+      process.env.hour12Color = hour12Color;
+    }
+    if (sleepColor) {
+      process.env.sleepColor = sleepColor;
+    }
+    if (nowColor) {
+      process.env.nowColor = nowColor;
+    }
+    if (appointmentColor) {
+      process.env.appointmentColor = appointmentColor;
+    }
+    if (amColor) {
+      process.env.amColor = amColor;
+    }
+    if (abColor) {
+      process.env.abColor = abColor;
+    }
+    if (pastDiv) {
+      process.env.pastDiv = pastDiv;
+    }
+    res.status(200).send(await getLeds1(-1));
   }
-  if (baseColor) {
-    process.env.baseColor = baseColor;
+  else
+  {
+    res.status(200).send(baseColor);
   }
-  if (hourColor) {
-    process.env.hourColor = hourColor;
-  }
-  if (hour3Color) {
-    process.env.hour3Color = hour3Color;
-  }
-  if (hour12Color) {
-    process.env.hour12Color = hour12Color;
-  }
-  if (sleepColor) {
-    process.env.sleepColor = sleepColor;
-  }
-  if (nowColor) {
-    process.env.nowColor = nowColor;
-  }
-  if (appointmentColor) {
-    process.env.appointmentColor = appointmentColor;
-  }
-  if (amColor) {
-    process.env.amColor = amColor;
-  }
-  if (abColor) {
-    process.env.abColor = abColor;
-  }
-  if (pastDiv) {
-    process.env.pastDiv = pastDiv;
-  }
-  res.status(200).send(await getLeds1(-1));
 }

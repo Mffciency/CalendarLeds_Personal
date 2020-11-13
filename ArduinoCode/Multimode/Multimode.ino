@@ -43,6 +43,7 @@ WifiLib tel(true);
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
 const char *website = tel.getSite(1);
+const char *token = tel.getToken();
 
 // json conversion setup
 uint8_t Ary[432];
@@ -76,7 +77,8 @@ void CallWebsite()
   if (WiFi.status() == WL_CONNECTED)
   {                         //Check WiFi connection status
     HTTPClient http;        //Declare an object of class HTTPClient
-    http.begin(website); //Specify request destination
+    String call = website + "?token=" + token;
+    http.begin(call); //Specify request destination
 
     PrintLn("reaching site");
     int httpCode = http.GET(); //Send the request
