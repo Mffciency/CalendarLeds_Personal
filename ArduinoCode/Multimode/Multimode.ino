@@ -27,6 +27,7 @@ FASTLED_USING_NAMESPACE
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
+#define DATA_PIN    5
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS 144
@@ -45,6 +46,9 @@ const char *password = tel.getPass();
 const char *website = tel.getSite(1);
 const char *token = tel.getToken();
 
+String useWebsite = String(website);
+String useToken = String(token);
+
 // json conversion setup
 uint8_t Ary[432];
 uint8_t i = 0, j = 0;
@@ -52,8 +56,8 @@ uint8_t i = 0, j = 0;
 #define ARRAY_SIZE(array) ((sizeof(array)) / (sizeof(array[0])))
 
 // general setup
-const bool showUpdates = true;
-const int refreshRate = 1; // how many times per minute does a webcall need to go out
+bool showUpdates = true;
+int refreshRate = 1; // how many times per minute does a webcall need to go out
 
 void PrintLn(String text)
 {
@@ -77,7 +81,7 @@ void CallWebsite()
   if (WiFi.status() == WL_CONNECTED)
   {                         //Check WiFi connection status
     HTTPClient http;        //Declare an object of class HTTPClient
-    String call = website + "?token=" + token;
+    String call = String(useWebsite) + "?token=" + String(token);
     http.begin(call); //Specify request destination
 
     PrintLn("reaching site");
@@ -121,9 +125,9 @@ void JsonToFastled(JsonObject obj)
     int G = obj[String("LedSequence")][i][1];
     int B = obj[String("LedSequence")][i][2];
     leds[i] = CRGB(R, G, B);
-    Print(String(R));
-    Print(String(G));
-    PrintLn(String(B));
+    //Print(String(R));
+    //Print(String(G));
+    //PrintLn(String(B));
     FastLED.show();
     delay(30);
   }
@@ -131,10 +135,14 @@ void JsonToFastled(JsonObject obj)
 
 void JsonToRefreshRate(JsonObject obj){
   refreshRate = obj[String("refreshRate")];
+  Print("refreshrate: ");
+  PrintLn(String(refreshRate));
 }
 
 void JsonToWebsite(JsonObject obj){
-  website = obj[String("website")];
+  useWebsite = obj[String("website")].as<String>();
+  Print("website: ");
+  PrintLn(useWebsite);
 }
 
 void setup()

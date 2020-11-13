@@ -28,6 +28,7 @@ const calId = require('./login.json').PriveCalendar;
 const calId2 = require('./login.json').am;
 const calId3 = require('./login.json').ab;
 const accessToken = require('./login.json').at;
+const baseWebsite = require('./login.json').web;
 
 /* for adding a new calendar, make sure:
 - you update the login file in the google cloud environment
@@ -54,9 +55,9 @@ var nowColor = [0, 0, 0]//[0, 20, 0] // the color of the led indicating the curr
 var appointmentColor = [0, 0, 0]//[4, 0, 16] // the color of the appointments of the first calendar
 var amColor = [0, 0, 0]//[8, 8, 0] // the color of the appointments of the second calendar
 var abColor = [0, 0, 0]//[0, 4, 8] // the color of the appointments of the third calendar
-var pastDiv = 4 // you divide the brightness of the leds in the past by this amount
-var refreshRate = 1 //de divider of the refreshrate of the arduino
-var website = "www.google.com"
+var pastDiv = 4.0 // you divide the brightness of the leds in the past by this amount
+var refreshRate = 1.0 //de divider of the refreshrate of the arduino
+var website = baseWebsite
 var datatimes = []
 var LedSequence = []
 var showPrint = true;
@@ -77,11 +78,11 @@ function onSelfReset(){
   appointmentColor = [0, 0, 0];
   amColor = [0, 0, 0];
   abColor = [0, 0, 0];
-  pastDiv = 4;
+  pastDiv = 4.0;
 }
 
 function updateVars() {
-  var show = 1;
+  var show = 0;
   console.log("updating vars")
   if (show) {
     console.log("before : nrLeds:", nrLeds, "baseColor:", baseColor, typeof baseColor, "hourColor:", hourColor, "hour3Color:", hour3Color, "hour12Color:", hour12Color, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appointmentColor, "amColor:", amColor, "pastDiv:", pastDiv)
@@ -96,7 +97,9 @@ function updateVars() {
   appointmentColor = JSON.parse(process.env.appointmentColor);
   amColor = JSON.parse(process.env.amColor);
   abColor = JSON.parse(process.env.abColor);
-  pastDiv = process.env.pastDiv;
+  pastDiv = parseFloat(process.env.pastDiv);
+  refreshRate = parseFloat(process.env.refreshRate);
+  website = process.env.website;
   if (show) {
     console.log("before : nrLeds:", nrLeds, "baseColor:", baseColor, typeof baseColor, "hourColor:", hourColor, "hour3Color:", hour3Color, "hour12Color:", hour12Color, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appointmentColor, "amColor:", amColor, "pastDiv:", pastDiv)
   }
@@ -391,6 +394,8 @@ exports.getLeds1 = async function (req, res) {
     let amColor = req.query.amColor || req.body.amColor;
     let abColor = req.query.abColor || req.body.abColor;
     let pastDiv = req.query.pastDiv || req.body.pastDiv;
+    let refreshRate = req.query.refreshRate || req.body.refreshRate;
+    let website = req.query.website || req.body.website;
     if (nrLeds) {
       process.env.nrLeds = nrLeds;
     }
@@ -423,6 +428,12 @@ exports.getLeds1 = async function (req, res) {
     }
     if (pastDiv) {
       process.env.pastDiv = pastDiv;
+    }
+    if (pastDiv) {
+      process.env.pastDiv = refreshRate;
+    }
+    if (pastDiv) {
+      process.env.pastDiv = website;
     }
     res.status(200).send(await getLeds1(-1));
   }
