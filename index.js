@@ -429,11 +429,11 @@ exports.getLeds1 = async function (req, res) {
     if (pastDiv) {
       process.env.pastDiv = pastDiv;
     }
-    if (pastDiv) {
-      process.env.pastDiv = refreshRate;
+    if (refreshRate) {
+      process.env.refreshRate = refreshRate;
     }
-    if (pastDiv) {
-      process.env.pastDiv = website;
+    if (website) {
+      process.env.website = website;
     }
     res.status(200).send(await getLeds1(-1));
   }

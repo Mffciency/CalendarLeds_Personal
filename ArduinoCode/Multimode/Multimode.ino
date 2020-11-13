@@ -57,7 +57,7 @@ uint8_t i = 0, j = 0;
 
 // general setup
 bool showUpdates = true;
-int refreshRate = 1; // how many times per minute does a webcall need to go out
+double refreshRate = 1; // how many times per minute does a webcall need to go out
 
 void PrintLn(String text)
 {
@@ -82,6 +82,7 @@ void CallWebsite()
   {                         //Check WiFi connection status
     HTTPClient http;        //Declare an object of class HTTPClient
     String call = String(useWebsite) + "?token=" + String(token);
+    PrintLn(String(call));
     http.begin(call); //Specify request destination
 
     PrintLn("reaching site");
