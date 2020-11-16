@@ -57,7 +57,7 @@ async function getTest() {
         }
     }
     else {
-        LedSequence = [baseColor, hourColor]
+        LedSequence = [baseColor, hourColor, [0,2,2],[2,0,2]]
     }
     console.log(Color);
 

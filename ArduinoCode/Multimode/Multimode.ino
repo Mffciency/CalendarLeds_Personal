@@ -32,6 +32,7 @@ FASTLED_USING_NAMESPACE
 #define COLOR_ORDER GRB
 #define NUM_LEDS 144
 CRGB leds[NUM_LEDS];
+CRGB prevleds[NUM_LEDS];
 
 #define BRIGHTNESS 80
 const int LOWBRIGHTNESS = BRIGHTNESS - 45;
@@ -52,14 +53,16 @@ const char *token = tel.getToken();
 String useWebsite = String(website);
 String useToken = String(token);
 
+double refreshRate = 1; // how many times per minute does a webcall need to go out
+
 // Different modes
 int useMode = mode;
 /*
-1 : show set slowly
-2 : show set instant
-3 : hartbeat
-4 : flash between set of colors
-5 : update one led, no reset
+1 : show set of leds slowly
+2 : show set of leds instant
+3 : show set of colors over whole strip, with interval
+4 : update one led, no reset
+5 : test
 */
 
 // json conversion setup
@@ -70,7 +73,6 @@ uint8_t i = 0, j = 0;
 
 // general setup
 bool showUpdates = true;
-double refreshRate = 1; // how many times per minute does a webcall need to go out
 
 void PrintLn(String text)
 {
@@ -96,6 +98,8 @@ void CallWebsite()
   {                  //Check WiFi connection status
     HTTPClient http; //Declare an object of class HTTPClient
     String call = String(useWebsite) + "?token=" + String(token);
+    PrintLn(" ");
+    PrintLn("___ FROM Here ___");
     PrintLn(String(call));
     http.begin(call); //Specify request destination
 
@@ -135,77 +139,119 @@ void StringToJson(String textIn)
 void JsonToFastled(JsonObject obj)
 {
   // put the values of the json document into the ledstring
-  if (useMode == 3)
-  {
-    return;
-  }
-  if (useMode == 4)
-  {
-    
-    JsonArray array = obj[String("LedSequence")];
-    int arraysize = array.size();
-    Serial.println(array.size()); // 2
-    for (int i = 0; i < arraysize; i++)
+  if (useMode == 1)
+  { // slow showing of set
+    PrintLn("Mode 1");
+    for (int i = 0; i < 144; i++)
     {
       int R = obj[String("LedSequence")][i][0];
       int G = obj[String("LedSequence")][i][1];
       int B = obj[String("LedSequence")][i][2];
-      fill_solid(leds, NUM_LEDS, CRGB(R, G, B));
-      FastLED.show();
-      Serial.print("leds:");
-      Serial.print(leds[0]);
-      Serial.print(leds[1]);
-      Serial.print(leds[2]);
-      Serial.print(leds[143]);
-      Serial.println(leds[144]);
-      delay(50);
-    }  
-    
-    return;
-  }
-  if (useMode == 5)
-  {
-      int pos = obj[String("LedSequence")][0][0];
-      int R = obj[String("LedSequence")][1][0];
-      int G = obj[String("LedSequence")][1][1];
-      int B = obj[String("LedSequence")][1][2];
-      leds[pos] = CRGB(R, G, B);
-      FastLED.show();
-      Serial.print("leds:");
-      Serial.print(leds[0]);
-      Serial.print(leds[1]);
-      Serial.print(leds[2]);
-      Serial.print(leds[143]);
-      Serial.println(leds[144]);
-      
-    
-    return;
-  }
-  for (int i = 0; i < 144; i++)
-  {
-    int R = obj[String("LedSequence")][i][0];
-    int G = obj[String("LedSequence")][i][1];
-    int B = obj[String("LedSequence")][i][2];
-    leds[i] = CRGB(R, G, B);
-    //Print(String(R));
-    //Print(String(G));
-    //PrintLn(String(B));
-    if (useMode == 1 || useMode == 0)
-    {
+      leds[i] = CRGB(R, G, B);
       FastLED.show();
       delay(30);
     }
   }
-  if (useMode == 2)
-  {
+  else if (useMode == 2)
+  { // show set instant
+    PrintLn("Mode 2");
+    for (int i = 0; i < 144; i++)
+    {
+      int R = obj[String("LedSequence")][i][0];
+      int G = obj[String("LedSequence")][i][1];
+      int B = obj[String("LedSequence")][i][2];
+      leds[i] = CRGB(R, G, B);
+    }
     FastLED.show();
   }
-  Serial.print("leds:");
-  Serial.print(leds[0]);
-  Serial.print(leds[1]);
-  Serial.print(leds[2]);
-  Serial.print(leds[143]);
-  Serial.println(leds[144]);
+  else if (useMode == 3)
+  { // show set of colors over whole strip, with interval
+    PrintLn("Mode 3");
+    fullBar(obj, true);
+  }
+  else if (useMode == 4)
+  { // show one led
+    PrintLn("Mode 4");
+    oneLed(obj);
+  }
+  else if (useMode == 5)
+  { // slow showing of set + dimming
+    PrintLn("Mode 5");
+    for (int i = 0; i < 144; i++)
+    {
+      leds[i] = CRGB(0, 0, 0);
+      FastLED.show();
+      delay(30);
+      int R = obj[String("LedSequence")][i][0];
+      int G = obj[String("LedSequence")][i][1];
+      int B = obj[String("LedSequence")][i][2];
+      leds[i] = CRGB(R, G, B);
+      FastLED.show();
+      delay(30);
+    }
+  }
+  else if (useMode == 6)
+  { // fast flash
+    PrintLn("Mode 6");
+    // save current
+    //prevleds = leds; // save previous
+    for (int i = 0; i < 144; i++)
+    {
+      prevleds[i] = leds[i];
+    }
+    fullBar(obj, false);
+    for (int i = 0; i < 144; i++) // take back te previous
+    {
+      leds[i] = prevleds[i];
+    }
+    FastLED.show();
+  }
+  else
+  {
+    PrintLn("Mode Else");
+    leds[0] = CRGB(1, 0, 0); // something is wrong
+    FastLED.show();
+    delay(300);
+    leds[0] = CRGB(0, 0, 0);
+    FastLED.show();
+    delay(300);
+  }
+}
+
+void fullBar(JsonObject obj, bool slow)
+{
+  int interval = obj[String("LedSequence")][0][0]; // first array contains the interval
+  JsonArray array = obj[String("LedSequence")];
+  int arraysize = array.size();
+  PrintLn(String(array.size())); // 2
+  for (int i = 1; i < arraysize; i++)
+  {
+    int R = obj[String("LedSequence")][i][0];
+    int G = obj[String("LedSequence")][i][1];
+    int B = obj[String("LedSequence")][i][2];
+    fill_solid(leds, NUM_LEDS, CRGB(R, G, B));
+    FastLED.show();
+    if (slow)
+    {
+      if (i < arraysize - 1)
+      {
+        delay(interval);
+      }
+    }
+    else
+    {
+      delay(interval);
+    }
+  }
+}
+void oneLed(JsonObject obj)
+{
+  int pos = obj[String("LedSequence")][0][0]; // first array contains the led position
+  int R = obj[String("LedSequence")][1][0];
+  int G = obj[String("LedSequence")][1][1];
+  int B = obj[String("LedSequence")][1][2];
+  leds[pos] = CRGB(R, G, B);
+  FastLED.show();
 }
 
 void JsonToRefreshRate(JsonObject obj)
@@ -240,6 +286,7 @@ void bpm()
     leds[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
   }
 }
+
 void setup()
 {
   // setup leds
@@ -274,10 +321,6 @@ void setup()
 void loop()
 {
   delay(60000 / refreshRate); //Send a request every 60 seconds
-  if (useMode == 3)
-  {
-    
-    bpm();
-  }
+
   CallWebsite();
 }

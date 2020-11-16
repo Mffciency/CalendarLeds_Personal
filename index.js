@@ -30,6 +30,7 @@ const calId3 = require('./login.json').ab;
 const accessToken = require('./login.json').at;
 const baseWebsite = require('./login.json').web;
 
+
 /* for adding a new calendar, make sure:
 - you update the login file in the google cloud environment
 - you add exceptions to the overlayhours function
@@ -58,6 +59,7 @@ var abColor = [0, 0, 0]//[0, 4, 8] // the color of the appointments of the third
 var pastDiv = 4.0 // you divide the brightness of the leds in the past by this amount
 var refreshRate = 1.0 //de divider of the refreshrate of the arduino
 var website = baseWebsite
+var mode = 1;
 var datatimes = []
 var LedSequence = []
 var showPrint = true;
@@ -100,6 +102,7 @@ function updateVars() {
   pastDiv = parseFloat(process.env.pastDiv);
   refreshRate = parseFloat(process.env.refreshRate);
   website = process.env.website;
+  mode = process.env.mode;
   if (show) {
     console.log("before : nrLeds:", nrLeds, "baseColor:", baseColor, typeof baseColor, "hourColor:", hourColor, "hour3Color:", hour3Color, "hour12Color:", hour12Color, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appointmentColor, "amColor:", amColor, "pastDiv:", pastDiv)
   }
@@ -373,7 +376,7 @@ async function getLeds1(hourshift) {
   // console.log("export: ", LedSequence)
   if (hourshift != 0) { LedSequence.forEach(e => console.log(e)) }
 
-  return { LedSequence, refreshRate, website }
+  return { LedSequence, refreshRate, website, mode }
 }
 
 
@@ -396,6 +399,7 @@ exports.getLeds1 = async function (req, res) {
     let pastDiv = req.query.pastDiv || req.body.pastDiv;
     let refreshRate = req.query.refreshRate || req.body.refreshRate;
     let website = req.query.website || req.body.website;
+    let mode = req.query.mode || req.body.mode;
     if (nrLeds) {
       process.env.nrLeds = nrLeds;
     }
@@ -434,6 +438,9 @@ exports.getLeds1 = async function (req, res) {
     }
     if (website) {
       process.env.website = website;
+    }
+    if (mode) {
+      process.env.mode = mode;
     }
     res.status(200).send(await getLeds1(-1));
   }
