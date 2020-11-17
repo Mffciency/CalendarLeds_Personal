@@ -46,7 +46,7 @@ WifiLib tel(true);
 
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
-const char *website = tel.getSite(2);
+const char *website = tel.getSite(1);
 const int mode = tel.getMode();
 const char *token = tel.getToken();
 

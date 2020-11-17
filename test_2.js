@@ -15,19 +15,20 @@ let LedSequence2 = require('./info.json').LedSequence2;
 
 let refreshRate = 10;
 let website = testWebsite;
-let LedSequence = act.LedSequence;
+// let LedSequence = act.LedSequence;
 let Color0 = act.Color0;
 let Color1 = act.Color1;
 let Color2 = act.Color2;
 let Color3 = act.Color3;
 let mode = act.Mode;
 // let actions = ["Calendar", "CountUp", "CountDown", "Manual", "Weather", "DailyTask"];
-let action = "";
+let action = "CountUp";
 let opr = "";
 // let runAction = act.RunAction;
 let count = act.Count;
 let maxCount = act.MaxCount;
 let delay = act.Delay;
+let minutes = 5;
 
 
 function Manual(modeIn, refreshRateIn, websiteIn, sequenceIn) {
@@ -39,82 +40,37 @@ function Manual(modeIn, refreshRateIn, websiteIn, sequenceIn) {
 
 
 async function getTest(ord) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
-    hlp.Print("count: " + count);
-    hlp.Print("maxcount: " + maxCount);
-    act.CountUp();
-    action = "CountUp";
-
+    
+    
+    action = process.env.action;
+    console.log("after action");
     mode = process.env.mode;
     console.log("after mode");
     refreshRate = parseFloat(process.env.refreshRate);
     console.log("after refreshRate");
     website = process.env.website;
     console.log("after website");
+    if (action == "CountUp"){
+        await hlp.Print("count: " + count);
+        await hlp.Print("maxcount: " + maxCount);
+        await act.CountUp();
+    }
+    else if (action == "CountDown"){
+        minutes = process.env.minutes;
+        await hlp.Print("countdonw: " + count);
+        await hlp.Print("minutes: " + minutes);
+        await act.CountDown(minutes);
+    }
+    else if (action == "Manual"){
+        await act.SetLedSequence(JSON.parse(process.env.ManualLedSequence));
+    }
+    
+
+    let LedSequence = act.GetLedSequence();
 
     return { action, mode, refreshRate, website, LedSequence }
 }
 
-
-
-
-/*
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-readline.question('Input ', inp => {
-    hlp.Print("runaction: " + runAction);
-    runAction = Boolean(inp);
-    console.log(`input: ${inp}!`);
-    hlp.Print("runaction: " + runAction);
-    readline.close();
-});
-
-getTest(1)
-
-
-if (process.env.Color == "Red") {
-        console.log("went into if");
-        process.env.Color = "Orange";
-        LedSequence = LedSequence1;
-
-    }
-    else {
-        console.log("went into if 2");
-        process.env.Color = "Red";
-        LedSequence = LedSequence2;
-    }
-    console.log("for base");
-    if (Colors){
-        baseColor = JSON.parse(process.env.baseColor);
-        console.log("after base");
-        hourColor = JSON.parse(process.env.hourColor);
-        console.log("after hour");
-    }
-
-    mode = process.env.mode;
-    console.log("after mode");
-    refreshRate = parseFloat(process.env.refreshRate);
-    console.log("after refreshRate");
-    website = process.env.website;
-    console.log("after website");
-
-    if (mode == 1 || mode == 2) {
-        if (Color == "Red") {
-            Color = "Orange";
-            LedSequence = LedSequence1;
-        }
-        else if (Color == "Orange") {
-            Color = "Red";
-            LedSequence = LedSequence2;
-        }
-    }
-    else {
-        LedSequence = [baseColor, hourColor, [0,2,2],[2,0,2]]
-    }
-    console.log(Color);
-*/
 exports.getTest = async function (req, res) {
     let atok = req.query.token;
     if (atok == accessToken) {     
@@ -123,7 +79,7 @@ exports.getTest = async function (req, res) {
         let mode = req.query.mode || req.body.mode;
         let refreshRate = req.query.refreshRate || req.body.refreshRate;
         let website = req.query.website || req.body.website;
-        let ManualLedSequence = req.query.ManualLedSequence || req.body.ManualLedSequence;
+        let ManualLedSequence = req.query.LedSequence || req.body.LedSequence;
         if (action) {
             process.env.action = action;
         }
@@ -145,15 +101,27 @@ exports.getTest = async function (req, res) {
         if (start) {
             hlp.Print("start");
             process.env.start = start;
-            act.Count = 0;
-            act.RunAction = true;
-            act.LedSequence = [];
+            act.SetCount(0);
+            act.SetRunAction("start");
+            act.SetLedSequence([]);
         }
         if (stop) {
             hlp.Print("stop");
             process.env.stop = stop;
-            act.RunAction = false;
+            act.SetRunAction("stop");
         }
+        // for count down
+        let minutes = req.query.minutes || req.body.minutes;
+        if (minutes) {
+            hlp.Print("start");
+            process.env.minutes = minutes;
+            act.SetCount(-1);
+            process.env.start = start;
+            act.SetRunAction("start");
+            act.SetLedSequence([]);
+            process.env.refreshRate = 1;
+        }
+        
         res.status(200).send(await getTest());
     }
     else {

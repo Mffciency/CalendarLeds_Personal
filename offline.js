@@ -42,8 +42,15 @@ function Manual(modeIn, refreshRateIn, websiteIn, sequenceIn) {
 async function getTest(ord) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
     hlp.Print("count: " + count);
     hlp.Print("maxcount: " + maxCount);
-    act.RunAction = true;
-    await act.TestCountDown(5);
+    let ces = "[[0,0,0],[0,0,0]]"
+    // console.log(JSON.parse(ces));
+    
+    act.SetRunAction("start");
+    act.SetCount(0);
+    await act.SetLedSequence(JSON.parse(ces));
+    let LedSequence = act.GetLedSequence();
+    console.log(LedSequence)
+    // await act.TestCountDown(5);
     action = "CountUp";
 
     // mode = process.env.mode;
@@ -54,7 +61,7 @@ async function getTest(ord) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
 
     // console.log("after website");
 
-    // return { action, mode, refreshRate, website, LedSequence }
+    // console.log(action, mode, refreshRate, website, LedSequence )
 }
 
 
@@ -68,7 +75,8 @@ const readline = require('readline').createInterface({
 
 readline.question('Input ', inp => {
     hlp.Print("runaction: " + runAction);
-    runAction = Boolean(inp);
+    runAction = inp;
+    act.SetRunAction(inp);
     console.log(`input: ${inp}!`);
     hlp.Print("runaction: " + runAction);
     readline.close();
