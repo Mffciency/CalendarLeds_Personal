@@ -45,24 +45,24 @@ oAuth2Client.setCredentials({ refresh_token: refreshToken })
 const calendar = google.calendar({ version: 'v3', auth: oAuth2Client })
 
 // set up global variables
-var hourmod = 0 // if your pc has a different timezone than the google cloud
-var nrLeds = 144 // the amount of leds in your ledstrip
-var baseColor = [0, 0, 0]//[0, 0, 0] // the background color
-var hourColor = [0, 0, 0]//[4, 2, 8] // the color of the hour indications
-var hour3Color = [0, 0, 0]//[12, 16, 12] // the color of the hours divisible by 3
-var hour12Color = [0, 0, 0]//[30, 30, 30] // the color of the hours divisible by 12
-var sleepColor = [0, 0, 0]//[0, 0, 0] // the color of the leds before 7hr and after 23hr
-var nowColor = [0, 0, 0]//[0, 20, 0] // the color of the led indicating the current time
-var appointmentColor = [0, 0, 0]//[4, 0, 16] // the color of the appointments of the first calendar
-var amColor = [0, 0, 0]//[8, 8, 0] // the color of the appointments of the second calendar
-var abColor = [0, 0, 0]//[0, 4, 8] // the color of the appointments of the third calendar
-var pastDiv = 4.0 // you divide the brightness of the leds in the past by this amount
-var refreshRate = 1.0 //de divider of the refreshrate of the arduino
-var website = baseWebsite
-var mode = 1;
-var datatimes = []
-var LedSequence = []
-var showPrint = true;
+let hourmod = 0 // if your pc has a different timezone than the google cloud
+let nrLeds = 144 // the amount of leds in your ledstrip
+let baseColor = [0, 0, 0]//[0, 0, 0] // the background color
+let hourColor = [0, 0, 0]//[4, 2, 8] // the color of the hour indications
+let hour3Color = [0, 0, 0]//[12, 16, 12] // the color of the hours divisible by 3
+let hour12Color = [0, 0, 0]//[30, 30, 30] // the color of the hours divisible by 12
+let sleepColor = [0, 0, 0]//[0, 0, 0] // the color of the leds before 7hr and after 23hr
+let nowColor = [0, 0, 0]//[0, 20, 0] // the color of the led indicating the current time
+let appointmentColor = [0, 0, 0]//[4, 0, 16] // the color of the appointments of the first calendar
+let amColor = [0, 0, 0]//[8, 8, 0] // the color of the appointments of the second calendar
+let abColor = [0, 0, 0]//[0, 4, 8] // the color of the appointments of the third calendar
+let pastDiv = 4.0 // you divide the brightness of the leds in the past by this amount
+let refreshRate = 1.0 //de divider of the refreshrate of the arduino
+let website = baseWebsite
+let mode = 1;
+let datatimes = []
+let LedSequence = []
+let showPrint = true;
 
 Date.prototype.addHours = function (h) {
   this.setTime(this.getTime() + (h * 60 * 60 * 1000));
@@ -84,7 +84,7 @@ function onSelfReset(){
 }
 
 function updateVars() {
-  var show = 0;
+  let show = 0;
   console.log("updating vars")
   if (show) {
     console.log("before : nrLeds:", nrLeds, "baseColor:", baseColor, typeof baseColor, "hourColor:", hourColor, "hour3Color:", hour3Color, "hour12Color:", hour12Color, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appointmentColor, "amColor:", amColor, "pastDiv:", pastDiv)
@@ -159,8 +159,8 @@ async function prep(calendarId) {
       evitems.forEach(element => {
         if (element.start.dateTime) {
           // check if starttime and endtime are in the right order
-          var startpos = timeToLedpos(calTime(element.start.dateTime), true);
-          var endpos = timeToLedpos(calTime(element.end.dateTime));
+          let startpos = timeToLedpos(calTime(element.start.dateTime), true);
+          let endpos = timeToLedpos(calTime(element.end.dateTime));
 
           if (dateCheck(element.start.dateTime) == -1) {
             startpos = 0;
@@ -187,13 +187,13 @@ async function prep(calendarId) {
 }
 
 function dateCheck(timeIn) {
-  var date = Date.parse(timeIn);
-  var start = new Date();
+  let date = Date.parse(timeIn);
+  let start = new Date();
   start.setHours(0, 0, 0, 0);
   start.addHours(hourmod);
 
   // set end of today
-  var end = new Date();
+  let end = new Date();
   end.setHours(0, 1, 0, 0);
   end.addHours(24 + hourmod);
   if (date < start) {
@@ -211,16 +211,16 @@ function dateCheck(timeIn) {
 
 function calTime(timeIn) {
   //console.log("timein: ",timeIn)
-  var hour = timeIn.substring(11, 13);
+  let hour = timeIn.substring(11, 13);
   //console.log("hour: ",hour)
-  var min = timeIn.substring(14, 16);
+  let min = timeIn.substring(14, 16);
   return [hour, min];
 }
 
 function timeToLedpos([hour, min], down = false) {
   // change the time into a position on the ledstrip
   //console.log("hour: ",hour,":", min)
-  var deciMin = 0;
+  let deciMin = 0;
   if (down) {
     deciMin = Math.floor(min / 10);
   }
@@ -228,7 +228,7 @@ function timeToLedpos([hour, min], down = false) {
     deciMin = Math.ceil(min / 10);
   }
 
-  var ledPos = hour * 6 + deciMin;
+  let ledPos = hour * 6 + deciMin;
   // console.log("-----------------------")
   // console.log("info:")
   // console.log(hour, min, deciMin, ledPos);
@@ -302,22 +302,22 @@ function addZero(i) {
 async function dimPast() {
   console.log("dim past");
   // console.log(LedSequence);
-  var now = new Date();
+  let now = new Date();
   now.addHours(1);
-  var h = addZero(now.getHours());
-  var m = addZero(now.getMinutes());
+  let h = addZero(now.getHours());
+  let m = addZero(now.getMinutes());
   //console.log(now.getHours(),now.getMinutes());
   console.log(now);
   const curPos = timeToLedpos([h, m], true);
 
-  for (var pos = 0; pos <= curPos; pos++) {
+  for (let pos = 0; pos <= curPos; pos++) {
     if (pos == curPos) {
       LedSequence[pos] = nowColor;
     }
     else {
       // console.log("ledpos", [pos]);
       // console.log("before:",LedSequence[pos]);
-      //let newvar = [0,0,0]
+      //let newlet = [0,0,0]
       //console.log("newvar:",newvar);
       // console.log("ledpos:", LedSequence[pos][0], "div:", pastDiv);
       let newvar = [Math.round((LedSequence[pos][0]) / pastDiv), Math.round((LedSequence[pos][1]) / pastDiv), Math.round((LedSequence[pos][2]) / pastDiv)];
@@ -331,7 +331,7 @@ async function dimPast() {
 }
 
 async function shiftOne() {
-  var last = hour12Color;
+  let last = hour12Color;
   LedSequence.shift();
   LedSequence.push(last);
   // console.log(LedSequence);
@@ -376,7 +376,7 @@ async function getLeds1(hourshift) {
   // console.log("export: ", LedSequence)
   if (hourshift != 0) { LedSequence.forEach(e => console.log(e)) }
 
-  return { LedSequence, refreshRate, website, mode }
+  return { refreshRate, website, mode, LedSequence }
 }
 
 

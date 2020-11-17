@@ -5,19 +5,19 @@ a test script to work out a few things
 const baseWebsite = require('./login.json').web;
 const testWebsite = require('./login.json').web2;
 
-var LedSequence1 = require('./info.json').LedSequence1;
-var LedSequence2 = require('./info.json').LedSequence2;
+let LedSequence1 = require('./info.json').LedSequence1;
+let LedSequence2 = require('./info.json').LedSequence2;
 
 
 
-var refreshRate = 10;
-var website = testWebsite;
-var LedSequence = [];
-var Color = "Red";
-var Colors = false;
-var baseColor = [20, 0, 0]//[0, 0, 0] // the background color
-var hourColor = [0, 20, 0]//[4, 2, 8
-var mode = 1;
+let refreshRate = 10;
+let website = testWebsite;
+let LedSequence = [];
+let Color = "Red";
+let Colors = false;
+let baseColor = [20, 0, 0]//[0, 0, 0] // the background color
+let hourColor = [0, 20, 0]//[4, 2, 8
+let mode = 1;
 
 async function getTest() {
     if (process.env.Color == "Red") {

@@ -46,7 +46,7 @@ WifiLib tel(true);
 
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
-const char *website = tel.getSite(1);
+const char *website = tel.getSite(2);
 const int mode = tel.getMode();
 const char *token = tel.getToken();
 
@@ -100,14 +100,14 @@ void CallWebsite()
     String call = String(useWebsite) + "?token=" + String(token);
     PrintLn(" ");
     PrintLn("___ FROM Here ___");
-    PrintLn(String(call));
+    PrintLn("call: "+ String(call));
     http.begin(call); //Specify request destination
 
     PrintLn("reaching site");
     int httpCode = http.GET(); //Send the request
     if (httpCode > 0)
     { //Check the returning code
-      PrintLn(String(httpCode));
+      PrintLn("response: " + String(httpCode));
       String payload = http.getString(); //Get the request response payload
       PrintLn(payload);
 
@@ -118,6 +118,7 @@ void CallWebsite()
     {
       PrintLn("failed");
       String payload = http.getString(); //Get the request response payload
+      useWebsite = String(website);
       PrintLn(payload);
     }
     http.end(); //Close connection
@@ -136,13 +137,20 @@ void StringToJson(String textIn)
   JsonToWebsite(obj);
 }
 
+int arraySize(JsonObject obj){
+    JsonArray array = obj[String("LedSequence")];
+    int arraysize = array.size();
+    return arraysize;
+    }
+
 void JsonToFastled(JsonObject obj)
 {
   // put the values of the json document into the ledstring
   if (useMode == 1)
   { // slow showing of set
     PrintLn("Mode 1");
-    for (int i = 0; i < 144; i++)
+    //int maxi = arraySize(obj)+1;
+    for (int i = 0; i < NUM_LEDS; i++)
     {
       int R = obj[String("LedSequence")][i][0];
       int G = obj[String("LedSequence")][i][1];
@@ -155,7 +163,7 @@ void JsonToFastled(JsonObject obj)
   else if (useMode == 2)
   { // show set instant
     PrintLn("Mode 2");
-    for (int i = 0; i < 144; i++)
+    for (int i = 0; i < NUM_LEDS; i++)
     {
       int R = obj[String("LedSequence")][i][0];
       int G = obj[String("LedSequence")][i][1];
@@ -177,7 +185,7 @@ void JsonToFastled(JsonObject obj)
   else if (useMode == 5)
   { // slow showing of set + dimming
     PrintLn("Mode 5");
-    for (int i = 0; i < 144; i++)
+    for (int i = 0; i < NUM_LEDS; i++)
     {
       leds[i] = CRGB(0, 0, 0);
       FastLED.show();
@@ -221,11 +229,9 @@ void JsonToFastled(JsonObject obj)
 void fullBar(JsonObject obj, bool slow)
 {
   int interval = obj[String("LedSequence")][0][0]; // first array contains the interval
-  JsonArray array = obj[String("LedSequence")];
-  int arraysize = array.size();
-  PrintLn(String(array.size())); // 2
-  for (int i = 1; i < arraysize; i++)
-  {
+  int maxi = arraySize(obj)+1;
+    for (int i = 1; i < maxi; i++)
+    {
     int R = obj[String("LedSequence")][i][0];
     int G = obj[String("LedSequence")][i][1];
     int B = obj[String("LedSequence")][i][2];
@@ -233,7 +239,7 @@ void fullBar(JsonObject obj, bool slow)
     FastLED.show();
     if (slow)
     {
-      if (i < arraysize - 1)
+      if (i < maxi-1)
       {
         delay(interval);
       }
@@ -244,6 +250,7 @@ void fullBar(JsonObject obj, bool slow)
     }
   }
 }
+
 void oneLed(JsonObject obj)
 {
   int pos = obj[String("LedSequence")][0][0]; // first array contains the led position
@@ -256,7 +263,10 @@ void oneLed(JsonObject obj)
 
 void JsonToRefreshRate(JsonObject obj)
 {
-  refreshRate = obj[String("refreshRate")];
+  
+  if (obj[String("refreshRate")] != 0){
+    refreshRate = obj[String("refreshRate")];
+    }
   Print("refreshrate: ");
   PrintLn(String(refreshRate));
 }
