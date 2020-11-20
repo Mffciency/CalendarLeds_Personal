@@ -60,7 +60,7 @@ async function Manual() {
 
 async function Calendar() {
     console.log("before cal");
-    await act.CreateCalendar();
+    await act.CreateCalendar(0);
     console.log("after cal");
 }
 

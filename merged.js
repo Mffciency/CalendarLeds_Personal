@@ -45,11 +45,12 @@ async function CountUp() {
 
 async function CountDown() {
     minutes = process.env.minutes;
-    await hlp.Print("countdonw: " + count);
+    await hlp.Print("countdown: " + count);
     await hlp.Print("minutes: " + minutes);
     let result = await act.CountDown(minutes);
     if (result == 0) {
-        website = baseWebsite;
+        action = "Calendar";
+        mode = 1;
     }
 }
 
@@ -78,7 +79,7 @@ async function getTest(hourshift) {//, modeIn, refreshRateIn, websiteIn, sequenc
     }
 
     let LedSequence = await act.GetLedSequence();
-
+    
     return { action, mode, refreshRate, website, LedSequence }
 }
 

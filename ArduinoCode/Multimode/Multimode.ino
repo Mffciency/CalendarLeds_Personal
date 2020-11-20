@@ -51,7 +51,7 @@ const char *website2 = tel.getSite(2);
 const int mode = tel.getMode();
 const char *token = tel.getToken();
 
-String currWebsite = String(website2);
+String currWebsite = String(website1);
 String nextWebsite = String(website2);
 String callWebsite = String(website2);
 String useToken = String(token);
@@ -78,6 +78,7 @@ uint8_t i = 0, j = 0;
 
 // general setup
 bool showUpdates = true;
+bool crashed = false;
 
 void PrintLn(String text)
 {
@@ -118,10 +119,12 @@ void CallWebsite()
 
       PrintLn("payload above"); //Print the response payload
       StringToJson(payload);
+      crashed = false;
     }
     else
     {
       PrintLn("failed");
+      crashed = true;
       //String payload = http.getString(); //Get the request response payload
       showRed();
       setWebsite(0);
@@ -133,31 +136,27 @@ void CallWebsite()
 
 void setWebsite(int type) {
   if (type == 1) {
-    callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=" + refreshRate + "&mode=" + useMode + "&action=" + useAction + "&website=" + nextWebsite;
-    currWebsite = nextWebsite;
+    callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=6";
   }
   else if (type == 2) {
     callWebsite = String(website2) + "?token=" + String(token) + "&refreshRate=1" + "&mode=1" + "&website=" + String(website2);
   }
   else {
-    callWebsite = String(website1) + "?token=" + String(token) + "&refreshRate=1" + "&mode=1" + "&action=Calendar" + "&website=" + String(website1);
-    nextWebsite = String(website1);
-    currWebsite = nextWebsite;
+    callWebsite = String(website1) + "?token=" + String(token) + "&refreshRate=6" + "&mode=1" + "&action=Calendar" + "&website=" + String(website1);
   }
-
-
 }
 
 void StringToJson(String textIn)
 {
   // convert the string into a json document.
-  DynamicJsonDocument doc(13999);
+  DynamicJsonDocument doc(14999);
   deserializeJson(doc, textIn);
   JsonObject obj = doc.as<JsonObject>();
   JsonToMode(obj);
   JsonToFastled(obj);
   JsonToRefreshRate(obj);
   JsonToWebsite(obj);
+  JsonToAction(obj);
 }
 
 int arraySize(JsonObject obj) {
@@ -300,9 +299,9 @@ void JsonToRefreshRate(JsonObject obj)
 
 void JsonToWebsite(JsonObject obj)
 {
-  nextWebsite = obj[String("website")].as<String>();
+  currWebsite = obj[String("website")].as<String>();
   Print("website: ");
-  PrintLn(nextWebsite);
+  PrintLn(currWebsite);
 }
 
 void JsonToMode(JsonObject obj)
@@ -374,7 +373,10 @@ void setup()
 void loop()
 {
   delay(60000 / refreshRate); //Send a request every 60 seconds
-
+  if (!crashed){
+    setWebsite(1);
+    }
   CallWebsite();
-  setWebsite(1);
+  
+  
 }

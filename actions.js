@@ -31,22 +31,22 @@ let mode = 1;
 let refreshRate = 10;
 let website = "testWebsite";
 let LedSequence = [];
-let indColor0 = [0, 0, 0] // the basecolor
-let indColor1 = [4, 2, 0] // the first special color
-let indColor2 = [4, 4, 0]
-let indColor3 = [4, 4, 4]
-let ColorBad = [1, 0, 0]
-let ColorGood = [0, 2, 0]
+let indColor0 = [0, 0, 0];// the basecolor
+let indColor1 = [4, 2, 0]; // the first special color
+let indColor2 = [4, 4, 0];
+let indColor3 = [4, 4, 4];
+let ColorBad = [1, 0, 0];
+let ColorGood = [0, 2, 0];
 
 // date
-let sleepColor = [0, 0, 0]
-let nowColor = [0, 8, 0]
-let appColor0 = [5, 0, 5]
-let appColor1 = [0, 0, 0]
-let appColor2 = [0, 0, 0]
-let appColor3 = [0, 0, 0]
-let appColor4 = [0, 0, 0]
-let pastDiv = 4
+let sleepColor = [0, 0, 0];
+let nowColor = [0, 8, 0];
+let appColor0 = [5, 0, 5];
+let appColor1 = [0, 0, 0];
+let appColor2 = [0, 0, 0];
+let appColor3 = [0, 0, 0];
+let appColor4 = [0, 0, 0];
+let pastDiv = 4;
 
 let runAction = false;
 let count = 1;
@@ -68,6 +68,7 @@ function picRunAct(prc) {
 }
 
 function setLedSequence(scnc) {
+    hlp.Print("setting seq");
     LedSequence = scnc;
 }
 
@@ -81,16 +82,16 @@ function setCount(cnt) {
 
 function pushSpecial(count, pos1, pos2, pos3) {
     if (count % pos3 == 0) {
-        LedSequence.push(Color3);
+        LedSequence.push(indColor3);
     }
     else if (count % pos2 == 0) {
-        LedSequence.push(Color2);
+        LedSequence.push(indColor2);
     }
     else if (count % pos1 == 0) {
-        LedSequence.push(Color1);
+        LedSequence.push(indColor1);
     }
     else {
-        LedSequence.push(Color0);
+        LedSequence.push(indColor0);
     }
 }
 
@@ -101,9 +102,13 @@ function createBlank() {
 }
 
 function createFullSpecial(pos1, pos2, pos3) {
-    console.log(Color1, Color2, Color3)
-    for (let index = 1; index < nrLeds + 1; index++) {
-        pushSpecial(index, pos1, pos2, pos3);
+    hlp.Print("setting full special");
+    console.log(nrLeds, indColor1, indColor2, indColor3)
+    let end = nrLeds;
+    console.log("end:", end);
+    for (let x = 1; x <= end; x++) {
+        pushSpecial(x, pos1, pos2, pos3);
+        // console.log("index:", x);
     }
 }
 
@@ -134,23 +139,7 @@ async function CountUp(prc) {
     }                       //  ..  setTimeout()
 }
 
-async function testCountUp() {
-    setTimeout(function () {   //  call a 3s setTimeout when the loop is called
-        hlp.Print(count);
 
-        // code
-        if (count > 0) {
-            pushSpecial(count, 5, 10, 30)
-        }
-
-        // hlp.Print(LedSequence);
-        count++;                    //  increment the counter
-
-        if (count < maxCount && runAction) {           //  if the counter < 10, call the loop function
-            testCountUp();             //  ..  again which will trigger another 
-        }                       //  ..  setTimeout()
-    }, delay)
-}
 
 async function CountDown(nrMinutes) {
     if (nrMinutes == 0) {
@@ -179,44 +168,7 @@ async function CountDown(nrMinutes) {
     }
 }
 
-async function testCountDown(nrMinutes) {
-    if (nrMinutes == 0) { return; }
 
-
-    createFull(ColorBad);
-    // hlp.Print(LedSequence);
-
-    parts = Math.round(nrLeds / nrMinutes);
-    hlp.Print("runaction parts: " + runAction + parts);
-    testCountDownLoop(nrMinutes);
-
-
-}
-
-async function testCountDownLoop(nrMinutes) {
-
-    setTimeout(async function () {   //  call a 3s setTimeout when the loop is called
-        hlp.Print(count);
-
-        // code
-        if (count > 0) {
-            let start = (count - 1) * parts;
-            let stop = (count) * parts;
-            hlp.Print("startstop: " + start + stop);
-            fillSet(start, stop, ColorGood)
-        }
-
-        // hlp.Print(LedSequence);
-        count++;                    //  increment the counter
-
-        if (count <= nrMinutes && runAction) {           //  if the counter < 10, call the loop function
-            await testCountDownLoop(nrMinutes);             //  ..  again which will trigger another 
-        }
-        else {
-            return 0;
-        }                    //  ..  setTimeout()
-    }, delay)
-}
 
 // calendar functions
 async function createCalendar(hourshift) {
@@ -229,7 +181,9 @@ async function createCalendar(hourshift) {
     // first create a blank array
     //await createBlank();
     setLedSequence([]);
-    await createFullSpecial(6, 18, 72);
+    // console.log(LedSequence);
+    createFullSpecial(6, 18, 72);
+    // console.log(LedSequence);
     //console.log("starting sequ");
     //console.log(LedSequence);
     //console.log("");
@@ -260,7 +214,7 @@ function updateCalVars() { // update all variables that have something to do wit
     }
     nrLeds = process.env.nrLeds;
     console.log("updated lednrs")
-    
+
     indColor0 = JSON.parse(process.env.indColor0);
     indColor1 = JSON.parse(process.env.indColor1);
     indColor2 = JSON.parse(process.env.indColor2);
@@ -274,6 +228,12 @@ function updateCalVars() { // update all variables that have something to do wit
     appColor2 = JSON.parse(process.env.appColor2);
     appColor3 = JSON.parse(process.env.appColor3);
     appColor4 = JSON.parse(process.env.appColor4);
+
+    calColors[0] = appColor0;
+    calColors[1] = appColor1;
+    calColors[2] = appColor2;
+    calColors[3] = appColor3;
+    calColors[4] = appColor4;
     console.log("updated appcolornrs")
     pastDiv = parseFloat(process.env.pastDiv);
     if (show) {
@@ -316,18 +276,23 @@ async function getCalendarData(calendarId) {
             evitems.forEach(element => {
                 if (element.start.dateTime) {
                     // check if starttime and endtime are in the right order
-                    let startpos = timeToLedpos(calTime(element.start.dateTime), true);
-                    let endpos = timeToLedpos(calTime(element.end.dateTime));
+                    let startpos = 0;
+                    let endpos = nrLeds;
 
-                    if (dateCheck(element.start.dateTime) == -1) {
+                    if (dateCheck(element.start.dateTime) != -1) {
+                        startpos = timeToLedpos(calTime(element.start.dateTime), true);
+                    }
+                    if (dateCheck(element.end.dateTime) != 1) {
+                        endpos = timeToLedpos(calTime(element.end.dateTime));
+                    }
+                    if (startpos == -1){
                         startpos = 0;
                     }
-                    if (dateCheck(element.end.dateTime) == 1) {
-                        endpos = nrLeds;
+                    if (endpos == -1){
+                        endpos = 144;
                     }
-
-
-                    times.push([startpos, endpos]);
+                    console.log("start end ", startpos, endpos, nrLeds)
+                    times.push([parseInt(startpos), parseInt(endpos)]);
 
 
                     console.log("item name: ", element.summary)
@@ -367,7 +332,7 @@ function timeToLedpos([hour, min], down = false) {
         deciMin = Math.ceil(min / 10);
     }
 
-    let ledPos = hour * 6 + deciMin - 1;
+    let ledPos = hour * 6 + deciMin-1;
     // console.log("-----------------------")
     // console.log("info:")
     // console.log(hour, min, deciMin, ledPos);
@@ -424,7 +389,7 @@ async function dimPast() {
     now.addHours(1);
     let h = addZero(now.getHours());
     let m = addZero(now.getMinutes());
-    //console.log(now.getHours(),now.getMinutes());
+    console.log(now.getHours(), now.getMinutes());
     console.log(now);
     const curPos = timeToLedpos([h, m], true);
 
