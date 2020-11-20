@@ -50,7 +50,7 @@ let pastDiv = 4;
 
 let runAction = false;
 let count = 1;
-let maxCount = 60;
+let maxCount = 144;
 let delay = 1300;
 let parts = 0;
 let datatimes = []
@@ -158,10 +158,9 @@ async function testCountUp() {
 }
 
 async function CountDown(nrMinutes) {
-    if (nrMinutes == 0) {
+    if (nrMinutes == 0 ) {
         return 0;
     }
-
     if (count <= nrMinutes && runAction) {     //  call a 3s setTimeout when the loop is called
         hlp.Print("count" + count);
         hlp.Print("minutes" + nrMinutes);
@@ -178,10 +177,12 @@ async function CountDown(nrMinutes) {
             hlp.Print("runaction parts: " + runAction + parts);
         }
         hlp.Print(LedSequence);
+        if (count == nrMinutes){
+            return 0;
+        }
         count++;                    //  increment the counter
-    } else {
-        return 0;
-    }
+    } 
+    
 }
 
 async function testCountDown(nrMinutes) {

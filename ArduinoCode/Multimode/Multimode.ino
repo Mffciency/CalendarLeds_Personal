@@ -77,7 +77,7 @@ uint8_t i = 0, j = 0;
 #define ARRAY_SIZE(array) ((sizeof(array)) / (sizeof(array[0])))
 
 // general setup
-bool showUpdates = true;
+bool showUpdates = false;
 bool crashed = false;
 
 void PrintLn(String text)
