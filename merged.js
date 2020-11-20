@@ -50,7 +50,6 @@ async function CountDown() {
     let result = await act.CountDown(minutes);
     if (result == 0) {
         action = "Calendar";
-        mode = 1;
     }
 }
 

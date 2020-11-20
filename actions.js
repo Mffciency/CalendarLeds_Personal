@@ -139,7 +139,23 @@ async function CountUp(prc) {
     }                       //  ..  setTimeout()
 }
 
+async function testCountUp() {
+    setTimeout(function () {   //  call a 3s setTimeout when the loop is called
+        hlp.Print(count);
 
+        // code
+        if (count > 0) {
+            pushSpecial(count, 5, 10, 30)
+        }
+
+        // hlp.Print(LedSequence);
+        count++;                    //  increment the counter
+
+        if (count < maxCount && runAction) {           //  if the counter < 10, call the loop function
+            testCountUp();             //  ..  again which will trigger another 
+        }                       //  ..  setTimeout()
+    }, delay)
+}
 
 async function CountDown(nrMinutes) {
     if (nrMinutes == 0) {
@@ -168,7 +184,44 @@ async function CountDown(nrMinutes) {
     }
 }
 
+async function testCountDown(nrMinutes) {
+    if (nrMinutes == 0) { return; }
 
+
+    createFull(ColorBad);
+    // hlp.Print(LedSequence);
+
+    parts = Math.round(nrLeds / nrMinutes);
+    hlp.Print("runaction parts: " + runAction + parts);
+    testCountDownLoop(nrMinutes);
+
+
+}
+
+async function testCountDownLoop(nrMinutes) {
+
+    setTimeout(async function () {   //  call a 3s setTimeout when the loop is called
+        hlp.Print(count);
+
+        // code
+        if (count > 0) {
+            let start = (count - 1) * parts;
+            let stop = (count) * parts;
+            hlp.Print("startstop: " + start + stop);
+            fillSet(start, stop, ColorGood)
+        }
+
+        // hlp.Print(LedSequence);
+        count++;                    //  increment the counter
+
+        if (count <= nrMinutes && runAction) {           //  if the counter < 10, call the loop function
+            await testCountDownLoop(nrMinutes);             //  ..  again which will trigger another 
+        }
+        else {
+            return 0;
+        }                    //  ..  setTimeout()
+    }, delay)
+}
 
 // calendar functions
 async function createCalendar(hourshift) {
