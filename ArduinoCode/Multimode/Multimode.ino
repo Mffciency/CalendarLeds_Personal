@@ -51,7 +51,7 @@ const char *website2 = tel.getSite(2);
 const int mode = tel.getMode();
 const char *token = tel.getToken();
 
-String currWebsite = String(website1);
+String currWebsite = String(website2);
 String nextWebsite = String(website2);
 String callWebsite = String(website2);
 String useToken = String(token);
@@ -136,10 +136,10 @@ void CallWebsite()
 
 void setWebsite(int type) {
   if (type == 1) {
-    callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=6";
+    callWebsite = currWebsite + "?token=" + String(token);
   }
   else if (type == 2) {
-    callWebsite = String(website2) + "?token=" + String(token) + "&refreshRate=1" + "&mode=1" + "&website=" + String(website2);
+    callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=6";
   }
   else {
     callWebsite = String(website1) + "?token=" + String(token) + "&refreshRate=6" + "&mode=1" + "&action=Calendar" + "&website=" + String(website1);
@@ -366,7 +366,7 @@ void setup()
   FastLED.show();
 
   // do a first call to the website to get the led sequence
-  setWebsite(1);
+  setWebsite(2);
   CallWebsite();
 }
 
