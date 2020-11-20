@@ -1,13 +1,13 @@
 /*
-To remember: always save modifications!
-Todo: 
-- add local webpage to cycle between modes
-- show future/previous days
-- show temperature/cloudcoverage
-- show sunrise/sunset
-- discomode
-- animate on phone notification
-- change refresh rate
+  To remember: always save modifications!
+  Todo:
+  - add local webpage to cycle between modes
+  - show future/previous days
+  - show temperature/cloudcoverage
+  - show sunrise/sunset
+  - discomode
+  - animate on phone notification
+  - change refresh rate
 */
 #include "WifiLib.h"
 
@@ -46,23 +46,28 @@ WifiLib tel(true);
 
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
-const char *website = tel.getSite(1);
+const char *website1 = tel.getSite(1);
+const char *website2 = tel.getSite(2);
 const int mode = tel.getMode();
 const char *token = tel.getToken();
 
-String useWebsite = String(website);
+String currWebsite = String(website2);
+String nextWebsite = String(website2);
+String callWebsite = String(website2);
 String useToken = String(token);
+String useAction = "Calendar";
 
-double refreshRate = 1; // how many times per minute does a webcall need to go out
+double refreshRate = 6; // how many times per minute does a webcall need to go out
+
 
 // Different modes
 int useMode = mode;
 /*
-1 : show set of leds slowly
-2 : show set of leds instant
-3 : show set of colors over whole strip, with interval
-4 : update one led, no reset
-5 : test
+  1 : show set of leds slowly
+  2 : show set of leds instant
+  3 : show set of colors over whole strip, with interval
+  4 : update one led, no reset
+  5 : test
 */
 
 // json conversion setup
@@ -95,17 +100,17 @@ void CallWebsite()
   // call the website to get an array of RGB values in return
 
   if (WiFi.status() == WL_CONNECTED)
-  {                  //Check WiFi connection status
+  { //Check WiFi connection status
     HTTPClient http; //Declare an object of class HTTPClient
-    String call = String(useWebsite) + "?token=" + String(token);
+    String call = callWebsite;
     PrintLn(" ");
     PrintLn("___ FROM Here ___");
-    PrintLn("call: "+ String(call));
+    PrintLn("call: " + String(call));
     http.begin(call); //Specify request destination
 
     PrintLn("reaching site");
     int httpCode = http.GET(); //Send the request
-    if (httpCode > 0)
+    if (httpCode == 200)
     { //Check the returning code
       PrintLn("response: " + String(httpCode));
       String payload = http.getString(); //Get the request response payload
@@ -117,12 +122,30 @@ void CallWebsite()
     else
     {
       PrintLn("failed");
-      String payload = http.getString(); //Get the request response payload
-      useWebsite = String(website);
-      PrintLn(payload);
+      //String payload = http.getString(); //Get the request response payload
+      showRed();
+      setWebsite(0);
+      //PrintLn(payload);
     }
     http.end(); //Close connection
   }
+}
+
+void setWebsite(int type) {
+  if (type == 1) {
+    callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=" + refreshRate + "&mode=" + useMode + "&action=" + useAction + "&website=" + nextWebsite;
+    currWebsite = nextWebsite;
+  }
+  else if (type == 2) {
+    callWebsite = String(website2) + "?token=" + String(token) + "&refreshRate=1" + "&mode=1" + "&website=" + String(website2);
+  }
+  else {
+    callWebsite = String(website1) + "?token=" + String(token) + "&refreshRate=1" + "&mode=1" + "&action=Calendar" + "&website=" + String(website1);
+    nextWebsite = String(website1);
+    currWebsite = nextWebsite;
+  }
+
+
 }
 
 void StringToJson(String textIn)
@@ -137,11 +160,11 @@ void StringToJson(String textIn)
   JsonToWebsite(obj);
 }
 
-int arraySize(JsonObject obj){
-    JsonArray array = obj[String("LedSequence")];
-    int arraysize = array.size();
-    return arraysize;
-    }
+int arraySize(JsonObject obj) {
+  JsonArray array = obj[String("LedSequence")];
+  int arraysize = array.size();
+  return arraysize;
+}
 
 void JsonToFastled(JsonObject obj)
 {
@@ -229,9 +252,9 @@ void JsonToFastled(JsonObject obj)
 void fullBar(JsonObject obj, bool slow)
 {
   int interval = obj[String("LedSequence")][0][0]; // first array contains the interval
-  int maxi = arraySize(obj)+1;
-    for (int i = 1; i < maxi; i++)
-    {
+  int maxi = arraySize(obj);
+  for (int i = 1; i < maxi; i++)
+  {
     int R = obj[String("LedSequence")][i][0];
     int G = obj[String("LedSequence")][i][1];
     int B = obj[String("LedSequence")][i][2];
@@ -239,7 +262,7 @@ void fullBar(JsonObject obj, bool slow)
     FastLED.show();
     if (slow)
     {
-      if (i < maxi-1)
+      if (i < maxi - 1)
       {
         delay(interval);
       }
@@ -249,6 +272,10 @@ void fullBar(JsonObject obj, bool slow)
       delay(interval);
     }
   }
+  Serial.print("leds: ");
+  Serial.print(leds[0][0]);
+  Serial.print(leds[0][1]);
+  Serial.println(leds[0][2]);
 }
 
 void oneLed(JsonObject obj)
@@ -263,19 +290,19 @@ void oneLed(JsonObject obj)
 
 void JsonToRefreshRate(JsonObject obj)
 {
-  
-  if (obj[String("refreshRate")] != 0){
+
+  if (obj[String("refreshRate")] != 0) {
     refreshRate = obj[String("refreshRate")];
-    }
+  }
   Print("refreshrate: ");
   PrintLn(String(refreshRate));
 }
 
 void JsonToWebsite(JsonObject obj)
 {
-  useWebsite = obj[String("website")].as<String>();
+  nextWebsite = obj[String("website")].as<String>();
   Print("website: ");
-  PrintLn(useWebsite);
+  PrintLn(nextWebsite);
 }
 
 void JsonToMode(JsonObject obj)
@@ -284,6 +311,21 @@ void JsonToMode(JsonObject obj)
   Print("mode: ");
   PrintLn(String(useMode));
 }
+
+void JsonToAction(JsonObject obj)
+{
+  useAction = obj[String("action")].as<String>();
+  Print("action: ");
+  PrintLn(String(useAction));
+}
+
+void showRed(){
+  leds[0] = CRGB(20, 0, 0); // show blinking led when searching for wifi network
+  FastLED.show();
+  delay(1000);
+  leds[0] = CRGB(1, 0, 0); // show blinking led when searching for wifi network
+  FastLED.show();
+  }
 
 void bpm()
 {
@@ -325,6 +367,7 @@ void setup()
   FastLED.show();
 
   // do a first call to the website to get the led sequence
+  setWebsite(1);
   CallWebsite();
 }
 
@@ -333,4 +376,5 @@ void loop()
   delay(60000 / refreshRate); //Send a request every 60 seconds
 
   CallWebsite();
+  setWebsite(1);
 }
