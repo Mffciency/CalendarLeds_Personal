@@ -9,6 +9,8 @@
   - animate on phone notification
   - change refresh rate
 */
+bool showUpdates = false;
+
 #include "WifiLib.h"
 
 #include <ESP8266WiFi.h>
@@ -51,9 +53,8 @@ const char *website2 = tel.getSite(2);
 const int mode = tel.getMode();
 const char *token = tel.getToken();
 
-String currWebsite = String(website2);
-String nextWebsite = String(website2);
-String callWebsite = String(website2);
+String currWebsite = String(website1);
+String callWebsite = String(website1);
 String useToken = String(token);
 String useAction = "Calendar";
 
@@ -77,7 +78,6 @@ uint8_t i = 0, j = 0;
 #define ARRAY_SIZE(array) ((sizeof(array)) / (sizeof(array[0])))
 
 // general setup
-bool showUpdates = false;
 bool crashed = false;
 
 void PrintLn(String text)
@@ -366,7 +366,7 @@ void setup()
   FastLED.show();
 
   // do a first call to the website to get the led sequence
-  setWebsite(2);
+  setWebsite(1);
   CallWebsite();
 }
 
@@ -374,7 +374,7 @@ void loop()
 {
   delay(60000 / refreshRate); //Send a request every 60 seconds
   if (!crashed){
-    setWebsite(1);
+    setWebsite(0);
     }
   CallWebsite();
   

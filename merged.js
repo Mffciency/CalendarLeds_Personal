@@ -62,7 +62,7 @@ async function Calendar(hourshift) {
     await act.CreateCalendar(hourshift);
 }
 
-async function getTest(hourshift) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
+async function getLeds(hourshift) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
     await setValues();
     
     if (action == "CountUp") {
@@ -83,7 +83,7 @@ async function getTest(hourshift) {//, modeIn, refreshRateIn, websiteIn, sequenc
     return { action, mode, refreshRate, website, LedSequence }
 }
 
-exports.getTest = async function (req, res) {
+exports.getLeds = async function (req, res) {
     let atok = req.query.token;
     if (atok == accessToken) {
         // general
@@ -195,7 +195,7 @@ exports.getTest = async function (req, res) {
             process.env.nrLeds = nrLeds;
         }
 
-        res.status(200).send(await getTest(-1));
+        res.status(200).send(await getLeds(-1));
     }
     else {
         res.status(200).send(indColor0);
