@@ -125,6 +125,7 @@ function fillSet(start, stop, rgb) {
 }
 
 async function CountUp(prc) {
+    updateIndColors();
     hlp.Print("runaction: " + runAction);
     if (count < maxCount && runAction) {           //  if the counter < 10, call the loop function
         hlp.Print(count);
@@ -230,6 +231,7 @@ async function createCalendar(hourshift) {
     hourmod = hourshift;
     if (hourshift != 0) {
         // if this is running in the cloud then take the cloud variables
+        updateIndColors();
         updateCalVars();
     }
     // first create a blank array
@@ -260,8 +262,8 @@ async function createCalendar(hourshift) {
 
 }
 
-function updateCalVars() { // update all variables that have something to do with the calendar
-    let show = 1;
+function updateIndColors() { // update all variables that have something to do with the calendar
+    let show = 0;
     console.log("updating vars")
     if (show) {
         console.log("before : nrLeds:", nrLeds, "baseColor:", indColor0, typeof indColor0, "hourColor:", indColor1, "hour3Color:", indColor2, "hour12Color:", indColor3, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appColor0, "amColor:", appColor1, "pastDiv:", pastDiv)
@@ -274,6 +276,22 @@ function updateCalVars() { // update all variables that have something to do wit
     indColor2 = JSON.parse(process.env.indColor2);
     indColor3 = JSON.parse(process.env.indColor3);
     console.log("updated colornrs")
+    
+    if (show) {
+        console.log("aftr : nrLeds:", nrLeds, "baseColor:", indColor0, typeof indColor0, "hourColor:", indColor1, "hour3Color:", indColor2, "hour12Color:", indColor3, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appColor0, "amColor:", appColor1, "pastDiv:", pastDiv)
+    }
+    console.log("done updating vars")
+}
+
+function updateCalVars() { // update all variables that have something to do with the calendar
+    let show = 1;
+    console.log("updating vars")
+    if (show) {
+        console.log("before : nrLeds:", nrLeds, "baseColor:", indColor0, typeof indColor0, "hourColor:", indColor1, "hour3Color:", indColor2, "hour12Color:", indColor3, "sleepColor:", sleepColor, "nowColor:", nowColor, "appointmentColor:", appColor0, "amColor:", appColor1, "pastDiv:", pastDiv)
+    }
+    nrLeds = process.env.nrLeds;
+    console.log("updated lednrs")
+
     sleepColor = JSON.parse(process.env.sleepColor);
     nowColor = JSON.parse(process.env.nowColor);
     console.log("updated nowcolor")

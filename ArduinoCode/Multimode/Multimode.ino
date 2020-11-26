@@ -374,7 +374,7 @@ void loop()
 {
   delay(60000 / refreshRate); //Send a request every 60 seconds
   if (!crashed){
-    setWebsite(0);
+    setWebsite(1);
     }
   CallWebsite();
   

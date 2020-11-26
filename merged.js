@@ -18,7 +18,7 @@ let indColor1 = act.indColor1;
 let indColor2 = act.indColor2;
 let indColor3 = act.indColor3;
 let mode = act.Mode;
-let action = "Calendar";
+let thisaction = "";
 let opr = "";
 
 let count = act.Count;
@@ -27,7 +27,7 @@ let delay = act.Delay;
 let minutes = 5;
 
 async function setValues() {
-    action = process.env.action;
+    thisaction = process.env.action;
     console.log("after action");
     mode = process.env.mode;
     console.log("after mode");
@@ -64,20 +64,24 @@ async function Calendar(hourshift) {
 
 async function getLeds(hourshift) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
     await setValues();
-    
-    if (action == "CountUp") {
+    console.log("action : ", thisaction);
+    if (thisaction == "CountUp") {
+        console.log("counting up");
         await CountUp();
     }
-    else if (action == "CountDown") {
+    else if (thisaction == "CountDown") {
+        console.log("counting down");
         await CountDown();
     }
-    else if (action == "Manual") {
+    else if (thisaction == "Manual") {
+        console.log("manual");
         await Manual();
     }
-    else if (action == "Calendar") {
+    else if (thisaction == "Calendar") {
+        console.log("calendar");
         await Calendar(hourshift);
     }
-
+    let action = thisaction;
     let LedSequence = await act.GetLedSequence();
     
     return { action, mode, refreshRate, website, LedSequence }
@@ -93,6 +97,7 @@ exports.getLeds = async function (req, res) {
         let website = req.query.website || req.body.website;
         if (action) {
             process.env.action = action;
+            thisaction=action;
         }
         if (mode) {
             process.env.mode = mode;
