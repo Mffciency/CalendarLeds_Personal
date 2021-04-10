@@ -141,8 +141,11 @@ void setWebsite(int type) {
   else if (type == 2) {
     callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=6";
   }
-  else {
+  else if (type == 3) {
     callWebsite = String(website1) + "?token=" + String(token) + "&refreshRate=6" + "&mode=1" + "&action=Calendar" + "&website=" + String(website1);
+  }
+  else  {
+    callWebsite = currWebsite + "?token=" + String(token) + "&refreshRate=6";
   }
 }
 
@@ -271,10 +274,10 @@ void fullBar(JsonObject obj, bool slow)
       delay(interval);
     }
   }
-  Serial.print("leds: ");
-  Serial.print(leds[0][0]);
-  Serial.print(leds[0][1]);
-  Serial.println(leds[0][2]);
+  //Serial.print("leds: ");
+  //Serial.print(leds[0][0]);
+  //Serial.print(leds[0][1]);
+  //Serial.println(leds[0][2]);
 }
 
 void oneLed(JsonObject obj)
