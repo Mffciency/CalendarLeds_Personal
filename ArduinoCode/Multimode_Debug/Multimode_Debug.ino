@@ -82,21 +82,7 @@ uint8_t i = 0, j = 0;
 // general setup
 bool crashed = false;
 
-void PrintLn(String text)
-{
-  if (showUpdates)
-  {
-    Serial.println(text);
-  }
-}
 
-void Print(String text)
-{
-  if (showUpdates)
-  {
-    Serial.print(text);
-  }
-}
 
 /* void CallWebsite()
 {
