@@ -391,16 +391,16 @@ void loop()
 {
   delay(1000);
   fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
-    leds[0] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[5] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[10] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[15] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[20] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[25] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[30] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
-  leds[40] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  //leds[10] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  //leds[11] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
   FastLED.show();
   PrintLn("full");
+  delay(1000);
+  fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
+  leds[10] = CRGB(80, 1, 1); // to indicate the ledstrip / arduino is running
+  leds[11] = CRGB(80, 1, 1); // to indicate the ledstrip / arduino is running
+  FastLED.show();
+  PrintLn("empty");
   
   /* delay(60000 / refreshRate); //Send a request every 60 seconds
   if (BUTTON_VALUE == 1){

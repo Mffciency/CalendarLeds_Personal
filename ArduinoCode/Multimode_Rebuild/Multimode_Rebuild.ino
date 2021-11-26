@@ -14,36 +14,8 @@
 #include "Helpers.h"
 
 Helpers h();
-/* 
 
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
-#include <ArduinoJson.h> */
 
-#define FASTLED_INTERRUPT_RETRY_COUNT 0
-#define FASTLED_ESP8266_RAW_PIN_ORDER
-#define FASTLED_ALLOW_INTERRUPTS 0
-#include <FastLED.h>
-
-FASTLED_USING_NAMESPACE
-
-// fastled setup
-#if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
-#warning "Requires FastLED 3.1 or later; check github for latest code."
-#endif
-#define DATA_PIN    4
-
-#define LED_TYPE WS2812B
-#define COLOR_ORDER GRB
-#define NUM_LEDS 144
-CRGB leds[NUM_LEDS];
-CRGB prevleds[NUM_LEDS];
-
-#define BRIGHTNESS 80
-const int LOWBRIGHTNESS = BRIGHTNESS - 45;
-const int HIGHBRIGHTNESS = BRIGHTNESS + 80;
-#define FRAMES_PER_SECOND 60
 
 
 void setup()
@@ -62,10 +34,11 @@ void setup()
 void loop()
 {
   delay(1000);
+<<<<<<< HEAD
   fill_solid( leds, NUM_LEDS, CRGB(80,1,1));
   FastLED.show();
   delay(1000);
-  leds[0] = CRGB(8, 1, 1);
+=======
+  fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
   FastLED.show();
-  h.PrintLn("full"); 
-}
+  delay(1000);
