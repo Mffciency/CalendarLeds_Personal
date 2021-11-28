@@ -194,6 +194,8 @@ void nextPattern()
 //////////////////////////
 void Calendar() {
   EVERY_N_MILLISECONDS(60000 / refreshRate) {
+    Serial.println("Refreshrate");
+    Serial.println(refreshRate);
     if (!crashed){
     setWebsite(1);
       }
@@ -348,6 +350,8 @@ void CallWebsite()
       //PrintLn(payload);
     }
     http.end(); //Close connection
+    PrintLn("___ TO Here ___");
+    PrintLn(" ");
   }
 }
 
