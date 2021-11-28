@@ -14,7 +14,15 @@
 //   Updated Jan 2020 - for JC_button library updates
 //***************************************************************
 
-#include "FastLED.h"
+//---------------------------------------------------------------
+// This uses JChristensen's Button Library from:
+//   https://github.com/JChristensen/JC_Button
+
+#include <FastLED.h>
+#include "JC_Button.h"    // Include Button library
+const uint8_t buttonPin = 4;  // Set digital pin used with debounced pushbutton
+Button myButton(buttonPin, true, true, 50);  // Declare the button
+
 #define DATA_PIN    4
 //#define CLK_PIN   13
 #define LED_TYPE    WS2812B
@@ -23,15 +31,6 @@
 CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          25
 #define FRAMES_PER_SECOND  60
-
-
-//---------------------------------------------------------------
-// This uses JChristensen's Button Library from:
-//   https://github.com/JChristensen/JC_Button
-#include "JC_Button.h"    // Include Button library
-const uint8_t buttonPin = 4;  // Set digital pin used with debounced pushbutton
-Button myButton(buttonPin, true, true, 50);  // Declare the button
-
 
 //---------------------------------------------------------------
 void setup() {
@@ -50,8 +49,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-//SimplePatternList gPatterns = { applause, fillAndCC, blinkyblink1, blinkyblink2, spewFour, spew, confetti_GB, rainbow, confetti, sinelon, juggle };
-SimplePatternList gPatterns = {  AllWhite, twoDots, confetti_GB, rainbow, confetti, sinelon, juggle };
+SimplePatternList gPatterns = { AllWhite, twoDots, confetti_GB, rainbow, confetti, sinelon, juggle };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
