@@ -39,7 +39,8 @@ Button myButton(buttonPin, true, true, 50);  // Declare the button
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          25
-#define FRAMES_PER_SECOND  3
+#define FRAMES_PER_SECOND  60
+#define CALENDAR_FPS  3
 
 CRGB prevleds[NUM_LEDS];
 
@@ -156,7 +157,15 @@ void loop()
   // send the 'leds' array out to the actual LED strip
   FastLED.show();  
   // insert a delay to keep the framerate modest
-  FastLED.delay(1000/FRAMES_PER_SECOND); 
+  if (gCurrentPatternNumber != 0) // not calendar
+  {
+      FastLED.delay(1000/FRAMES_PER_SECOND); 
+  }
+  else // calendar
+  {
+     FastLED.delay(1000/CALENDAR_FPS); 
+  }
+  
 
   // do some periodic updates
   EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
@@ -171,11 +180,11 @@ void nextPattern()
 {
   // add one to the current pattern number, and wrap around at the end
   gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
-  if (gCurrentPatternNumber != 0)
+  if (gCurrentPatternNumber != 0) // not calendar
   {
     FastLED.setBrightness(BRIGHTNESS);
   }
-  else
+  else // calendar
   {
      FastLED.setBrightness(255);;
   }
