@@ -39,7 +39,7 @@ Button myButton(buttonPin, true, true, 50);  // Declare the button
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          25
-#define FRAMES_PER_SECOND  60
+#define FRAMES_PER_SECOND  3
 
 CRGB prevleds[NUM_LEDS];
 
