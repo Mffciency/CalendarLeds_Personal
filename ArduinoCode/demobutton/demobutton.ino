@@ -92,8 +92,8 @@ void nextPattern()
 //////////////////////////
 void AllWhite() {
   fill_solid( leds, NUM_LEDS, CRGB(255,255,200)); //GRB
-  EVERY_N_MILLISECONDS(3000) {
-    leds[0] = CRGB(200,200,50);
+  EVERY_N_MILLISECONDS(5000) {
+    leds[0] = CRGB(100,100,50);
   }
 }
 
