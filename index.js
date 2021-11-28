@@ -69,7 +69,7 @@ Date.prototype.addHours = function (h) {
   return this;
 }
 
-function onSelfReset(){
+function onSelfReset() {
   nrLeds = 144;
   baseColor = [0, 0, 0];
   hourColor = [0, 0, 0];
@@ -205,8 +205,6 @@ function dateCheck(timeIn) {
   else {
     return 0
   }
-
-
 }
 
 function calTime(timeIn) {
@@ -376,7 +374,7 @@ async function getLeds1(hourshift) {
   // console.log("export: ", LedSequence)
   if (hourshift != 0) { LedSequence.forEach(e => console.log(e)) }
 
-  return { refreshRate, website, mode, LedSequence }
+  return { action, mode, refreshRate, website, LedSequence }
 }
 
 
@@ -385,7 +383,7 @@ async function getLeds1(hourshift) {
 // use below in google cloud
 exports.getLeds1 = async function (req, res) {
   let atok = req.query.token;
-  if (atok == accessToken){
+  if (atok == accessToken) {
     let nrLeds = req.query.nrLeds || req.body.nrLeds;
     let baseColor = req.query.baseColor || req.body.baseColor;
     let hourColor = req.query.hourColor || req.body.hourColor;
@@ -444,8 +442,7 @@ exports.getLeds1 = async function (req, res) {
     }
     res.status(200).send(await getLeds1(-1));
   }
-  else
-  {
+  else {
     res.status(200).send(baseColor);
   }
 }

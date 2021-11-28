@@ -5,15 +5,19 @@
             "name": "Win32",
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64/cl.exe",
             "compilerArgs": [],
-            "intelliSenseMode": "msvc-x64",
+            "intelliSenseMode": "windows-msvc-x64",
             "includePath": [
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\**",
+                "C:\\Users\\admin\\Documents\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\**"
             ],
             "forcedInclude": [],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "defines": []
+            "defines": [
+                "USBCON"
+            ]
         },
         {
             "name": "Arduino",
@@ -33,11 +37,11 @@
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\tools\\sdk\\lwip2\\include",
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\tools\\sdk\\libc\\xtensa-lx106-elf\\include",
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\cores\\esp8266",
-                "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\variants\\nodemcu",
+                "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\variants\\adafruit",
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\libraries\\ESP8266WiFi\\src",
                 "C:\\Users\\admin\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\libraries\\ESP8266HTTPClient\\src",
                 "C:\\Users\\admin\\Documents\\Arduino\\libraries\\ArduinoJson\\src",
-                "C:\\Users\\admin\\Documents\\Arduino\\libraries\\FastLED\\src",
+                "C:\\Users\\admin\\Documents\\Arduino\\libraries\\FastLED",
                 "c:\\users\\admin\\appdata\\local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\xtensa-lx106-elf\\include\\c++\\4.8.2",
                 "c:\\users\\admin\\appdata\\local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\xtensa-lx106-elf\\include\\c++\\4.8.2\\xtensa-lx106-elf",
                 "c:\\users\\admin\\appdata\\local\\arduino15\\packages\\esp8266\\tools\\xtensa-lx106-elf-gcc\\2.5.0-4-b40a506\\xtensa-lx106-elf\\include\\c++\\4.8.2\\backward",
@@ -60,9 +64,9 @@
                 "LWIP_FEATURES=1",
                 "LWIP_IPV6=0",
                 "ARDUINO=10813",
-                "ARDUINO_ESP8266_NODEMCU",
+                "ARDUINO_ESP8266_ESP12",
                 "ARDUINO_ARCH_ESP8266",
-                "ARDUINO_BOARD=\"ESP8266_NODEMCU\"",
+                "ARDUINO_BOARD=\"ESP8266_ESP12\"",
                 "FLASHMODE_QIO",
                 "ESP8266",
                 "__DBL_MIN_EXP__=(-1021)",

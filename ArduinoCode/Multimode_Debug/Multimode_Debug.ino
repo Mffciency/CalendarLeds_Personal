@@ -9,14 +9,14 @@
   - animate on phone notification
   - change refresh rate
 */
-bool showUpdates = false;
+bool showUpdates = true;
 
-#include "WifiLib.h"
+/* #include "WifiLib.h"
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
-#include <ArduinoJson.h>
+#include <ArduinoJson.h> */
 
 #define FASTLED_INTERRUPT_RETRY_COUNT 0
 #define FASTLED_ESP8266_RAW_PIN_ORDER
@@ -29,7 +29,9 @@ FASTLED_USING_NAMESPACE
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
-#define DATA_PIN 5
+#define DATA_PIN    4
+//#define BUTTON_PIN    3
+//int BUTTON_VALUE = 0;
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS 144
@@ -44,7 +46,7 @@ const int HIGHBRIGHTNESS = BRIGHTNESS + 80;
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
 // Wifi setup
-WifiLib tel(true);
+/* WifiLib tel(true);
 
 const char *ssid = tel.getSsid();
 const char *password = tel.getPass();
@@ -57,12 +59,12 @@ String currWebsite = String(website1);
 String callWebsite = String(website1);
 String useToken = String(token);
 String useAction = "Calendar";
-
+ */
 double refreshRate = 6; // how many times per minute does a webcall need to go out
 
 
 // Different modes
-int useMode = mode;
+//int useMode = mode;
 /*
   1 : show set of leds slowly
   2 : show set of leds instant
@@ -96,7 +98,7 @@ void Print(String text)
   }
 }
 
-void CallWebsite()
+/* void CallWebsite()
 {
   // call the website to get an array of RGB values in return
 
@@ -340,20 +342,33 @@ void bpm()
     leds[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
   }
 }
+ */
 
 void setup()
 {
+  // Setup button
+  //pinMode(BUTTON_PIN, INPUT);
+  //BUTTON_VALUE = digitalRead(BUTTON_PIN);
   // setup leds
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.clear();              // clear the ledstrip
-  leds[0] = CRGB(50, 100, 150); // to indicate the ledstrip / arduino is running
+  leds[0] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[5] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[10] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[15] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[20] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[25] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[30] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  leds[40] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
   FastLED.show();
 
   //setup rest
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED)
+  PrintLn("starting 1");
+  //WiFi.begin(ssid, password);
+  PrintLn("starting x");
+  /* while (WiFi.status() != WL_CONNECTED)
   {
     delay(1000);
     leds[0] = CRGB(20, 20, 20); // show blinking led when searching for wifi network
@@ -364,22 +379,40 @@ void setup()
     FastLED.show();
   }
   PrintLn("");
-  PrintLn("Connected");
-  leds[0] = CRGB(0, 50, 0); // show green led when connected to wifi
-  FastLED.show();
-
+  PrintLn("Connected"); */
+  
+  
   // do a first call to the website to get the led sequence
-  setWebsite(1);
-  CallWebsite();
+  //setWebsite(1);
+  //CallWebsite();
 }
 
 void loop()
 {
-  delay(60000 / refreshRate); //Send a request every 60 seconds
-  if (!crashed){
+  delay(1000);
+  fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
+  //leds[10] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  //leds[11] = CRGB(80, 80, 80); // to indicate the ledstrip / arduino is running
+  FastLED.show();
+  PrintLn("full");
+  delay(1000);
+  fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
+  leds[10] = CRGB(80, 1, 1); // to indicate the ledstrip / arduino is running
+  leds[11] = CRGB(80, 1, 1); // to indicate the ledstrip / arduino is running
+  FastLED.show();
+  PrintLn("empty");
+  
+  /* delay(60000 / refreshRate); //Send a request every 60 seconds
+  if (BUTTON_VALUE == 1){
+    PrintLn("White ");
+    fill_solid( leds, NUM_LEDS, CRGB(80,80,80));
+    FastLED.show();
+  }
+  else{
+    if (!crashed){
     setWebsite(1);
     }
+  PrintLn("Normal running");
   CallWebsite();
-  
-  
+  } */  
 }

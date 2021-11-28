@@ -40,8 +40,6 @@ function Manual(modeIn, refreshRateIn, websiteIn, sequenceIn) {
 
 
 async function getTest(ord) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
-    
-    
     action = process.env.action;
     console.log("after action");
     mode = process.env.mode;
@@ -59,7 +57,10 @@ async function getTest(ord) {//, modeIn, refreshRateIn, websiteIn, sequenceIn) {
         minutes = process.env.minutes;
         await hlp.Print("countdonw: " + count);
         await hlp.Print("minutes: " + minutes);
-        await act.CountDown(minutes);
+        let result = await act.CountDown(minutes);
+        if (result == 0){
+            website = baseWebsite;
+        }
     }
     else if (action == "Manual"){
         await act.SetLedSequence(JSON.parse(process.env.ManualLedSequence));
@@ -119,7 +120,7 @@ exports.getTest = async function (req, res) {
             process.env.start = start;
             act.SetRunAction("start");
             act.SetLedSequence([]);
-            process.env.refreshRate = 1;
+            // process.env.refreshRate = 1;
         }
         
         res.status(200).send(await getTest());
