@@ -168,7 +168,7 @@ void loop()
   
 
   // do some periodic updates
-  EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+ 
 
 }//end_main_loop
 
@@ -186,6 +186,9 @@ void nextPattern()
   }
   else // calendar
   {
+     FastLED.clear();
+     leds[0] = CRGB(50, 0, 0); // show green led when connected to wifi
+      FastLED.show();
      FastLED.setBrightness(255);;
   }
   Serial.println(gCurrentPatternNumber);
@@ -193,9 +196,10 @@ void nextPattern()
 
 //////////////////////////
 void Calendar() {
-  EVERY_N_MILLISECONDS(60000 / refreshRate) {
+  int ref = 60 / refreshRate;
+  EVERY_N_SECONDS(ref) {
     Serial.println("Refreshrate");
-    Serial.println(refreshRate);
+    Serial.println(ref);
     if (!crashed){
     setWebsite(1);
       }
@@ -216,6 +220,7 @@ void rainbow()
 {
   // FastLED's built-in rainbow generator
   fill_rainbow( leds, NUM_LEDS, gHue, 12);
+   EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
 }
 
 //////////////////////////
