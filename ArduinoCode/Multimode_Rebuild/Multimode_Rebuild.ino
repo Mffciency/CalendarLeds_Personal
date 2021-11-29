@@ -28,18 +28,19 @@
 #include "JC_Button.h"    // Include Button library
 
 // JC button setup ------------------------------------------------
-const uint8_t buttonPin = 4;  // Set digital pin used with debounced pushbutton
+const uint8_t buttonPin = 4;  // = GPIO4 = D2 Set digital pin used with debounced pushbutton
 Button myButton(buttonPin, true, true, 50);  // Declare the button
 
 // Fastled setup -------------------------------------------------------
-#define DATA_PIN    4
+#define LED_PIN    4 // =GPIO2 = D4
+#define DATA_PIN    3 // =GPIO0 = D3
 //#define CLK_PIN   13
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          25
-#define FRAMES_PER_SECOND  60
+#define FRAMES_PER_SECOND  120
 #define CALENDAR_FPS  3
 
 CRGB prevleds[NUM_LEDS];
@@ -102,6 +103,8 @@ void Print(String text)
 void setup() {
   Serial.begin(115200);  // Allows serial monitor output (check baud rate)
   delay(1500); // short delay for recovery
+  pinMode(LED_PIN, OUTPUT); // Set LED_PIN as output
+  digitalWrite(LED_PIN, LOW); // Set LED_PIN low to turn off build in LED
   //FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(255);
@@ -137,7 +140,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { Calendar, AllWhite, twoDots, confetti_GB, rainbow, confetti, sinelon, juggle };
+SimplePatternList gPatterns = { Calendar, AllWhite, oneDot, confetti_GB, rainbow, confetti, sinelon, juggle };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -229,7 +232,7 @@ void confetti()
   // random colored speckles that blink in and fade smoothly
   fadeToBlackBy( leds, NUM_LEDS, 20);
   int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV( gHue + random8(64), random8(128,200), random8(48,255));
+  leds[pos] += CHSV( gHue + 10 + random8(12), random8(128,200), random8(48,255));
 }
 
 
@@ -258,7 +261,7 @@ void confetti_GB()
 void sinelon()
 {
   // a colored dot sweeping back and forth, with fading trails
-  fadeToBlackBy( leds, NUM_LEDS, 12);
+  fadeToBlackBy( leds, NUM_LEDS, 22);
   int pos = beatsin16( 13, 0, NUM_LEDS-1 );
   leds[pos] += CHSV( gHue, 255, 192);
 }
@@ -276,12 +279,12 @@ void juggle() {
 
 
 //////////////////////////
-void twoDots() {
+void oneDot() {
   
   static uint8_t pos;  //used to keep track of position
-  EVERY_N_MILLISECONDS(70) {
+  EVERY_N_MILLISECONDS(20) {
     fadeToBlackBy( leds, NUM_LEDS, 200);  //fade all the pixels some
-    leds[pos] = CHSV(gHue, random8(170,230), 255);
+    leds[pos] = CHSV(gHue, random8(0,25), 255);
     //leds[(pos+5) % NUM_LEDS] = CHSV(gHue+64, random8(170,230), 255);
     pos = pos + 1;  //advance position
     
@@ -289,7 +292,7 @@ void twoDots() {
     if (pos == NUM_LEDS) { pos = 0; }  //reset to beginning
     //Trying to write data to non-existent pixels causes bad things.
   }
-}//end_twoDots
+}//end_oneDot
 
 
 
