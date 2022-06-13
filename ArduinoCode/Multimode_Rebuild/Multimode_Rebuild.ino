@@ -39,8 +39,8 @@ Button myButton(buttonPin, true, true, 50);  // Declare the button
 #define COLOR_ORDER GRB
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
-#define BRIGHTNESS          25
-#define FRAMES_PER_SECOND  120
+#define BRIGHTNESS          255
+#define FRAMES_PER_SECOND   120
 #define CALENDAR_FPS  3
 
 CRGB prevleds[NUM_LEDS];
@@ -108,6 +108,7 @@ void setup() {
   //FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(255);
+  FastLED.showColor( CRGB::White ); 
   FastLED.clear();
   
   myButton.begin();  // initialize the button object
@@ -133,14 +134,14 @@ void setup() {
 
   // do a first call to the website to get the led sequence
   setWebsite(1);
-  CallWebsite();
+  //CallWebsite();
   
 }
 
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { Calendar, AllWhite, oneDot, confetti_GB, rainbow, confetti, sinelon, juggle };
+SimplePatternList gPatterns = { AllWhite, Calendar, oneDot, confetti_GB };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
