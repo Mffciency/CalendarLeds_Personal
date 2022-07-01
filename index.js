@@ -13,6 +13,7 @@ TODO:
 - link between google source and github
 - add more documentation
 - cleanup code
+- auto switch between summer and winter time
 
 */
 
