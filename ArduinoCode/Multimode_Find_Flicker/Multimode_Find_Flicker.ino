@@ -35,7 +35,7 @@ Button myButton(buttonPin, true, true, 50);  // Declare the button
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          10
-#define FRAMES_PER_SECOND   120
+#define FRAMES_PER_SECOND   10
 #define CALENDAR_FPS  3
 
 CRGB prevleds[NUM_LEDS];
@@ -103,36 +103,29 @@ void setup() {
   digitalWrite(LED_PIN, LOW); // Set LED_PIN low to turn off build in LED
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(10);
-
-  //fill_solid( leds, NUM_LEDS, CRGB(255,255,200));
-  PrintLn("white");
   FastLED.clear();
-
+  AllWhite();
+  FastLED.show();
   myButton.begin();  // initialize the button object
-
   Serial.println(" basic Setup done.\n");
-
   WiFi.begin(ssid, password);
-
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(1000);
-    leds[0] = CRGB(20, 20, 20); // show blinking led when searching for wifi network
-    FastLED.show();
+    //leds[0] = CRGB(20, 20, 20); // show blinking led when searching for wifi network
+    //FastLED.show();
     Print(".");
-    delay(1000);
-    leds[0] = CRGB(50, 100, 150);
-    FastLED.show();
+    //delay(1000);
+    //leds[0] = CRGB(50, 100, 150);
+    //FastLED.show();
   }
   PrintLn("");
   PrintLn("Connected");
-  leds[0] = CRGB(0, 50, 0); // show green led when connected to wifi
-  FastLED.show();
+  //leds[0] = CRGB(0, 50, 0); // show green led when connected to wifi
+  //FastLED.show();
 
   // do a first call to the website to get the led sequence
   setWebsite(1);
-  //CallWebsite();
-
 }
 
 
@@ -156,9 +149,9 @@ void loop()
   gPatterns[gCurrentPatternNumber]();
   //leds[0] = CRGB(0, 0, 0); // kill the first led when connected to wifi
   // send the 'leds' array out to the actual LED strip
-  FastLED.show();
+  
   // insert a delay to keep the framerate modest
-  if (gCurrentPatternNumber != 0) // not calendar
+  if (gCurrentPatternNumber != 0 || gCurrentPatternNumber != 1) // not calendar
   {
     FastLED.delay(1000 / FRAMES_PER_SECOND);
   }
@@ -205,31 +198,17 @@ void Calendar() {
 
 //////////////////////////
 void AllWhite() {
-  fill_solid( leds, NUM_LEDS, CRGB(5, 5, 4)); //GRB
-  //EVERY_N_MILLISECONDS(3000) {
-  //  leds[0] = CRGB(2, 2, 1);
-  //}
-}
-
-//////////////////////////
-void rainbow()
-{
-  // FastLED's built-in rainbow generator
-  fill_rainbow( leds, NUM_LEDS, gHue, 12);
-  EVERY_N_MILLISECONDS( 20 ) {
-    gHue++;  // slowly cycle the "base color" through the rainbow
+  //fill_solid( leds, NUM_LEDS, CRGB(5, 5, 4)); //GRB
+  //leds[0] = CRGB(22, 0, 0);
+  leds[1] = CRGB(22, 0, 0);
+  leds[2] = CRGB(22, 0, 0);
+  /* // Use the code below to show the ledstrip did not crash
+  EVERY_N_MILLISECONDS(3000) {
+    leds[0] = CRGB(2, 2, 1);
   }
+  //*/
+  FastLED.show();
 }
-
-//////////////////////////
-void confetti()
-{
-  // random colored speckles that blink in and fade smoothly
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV( gHue + 10 + random8(12), random8(128, 200), random8(48, 255));
-}
-
 
 //////////////////////////
 void confetti_GB()
@@ -249,29 +228,8 @@ void confetti_GB()
     }
     leds[pos] += CHSV( hue, random8(200, 240), 255);
   }
+  FastLED.show();
 }//end confetti_GB
-
-
-//////////////////////////
-void sinelon()
-{
-  // a colored dot sweeping back and forth, with fading trails
-  fadeToBlackBy( leds, NUM_LEDS, 22);
-  int pos = beatsin16( 13, 0, NUM_LEDS - 1 );
-  leds[pos] += CHSV( gHue, 255, 192);
-}
-
-//////////////////////////
-void juggle() {
-  // four colored dots, weaving in and out of sync with each other
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  byte dothue = 0;
-  for ( int i = 0; i < 4; i++) {
-    leds[beatsin16( i + 5, 0, NUM_LEDS - 1 )] |= CHSV(dothue, 200, 255);
-    dothue += 32;
-  }
-}
-
 
 //////////////////////////
 void oneDot() {
@@ -289,6 +247,7 @@ void oneDot() {
     }
     //Trying to write data to non-existent pixels causes bad things.
   }
+  FastLED.show();
 }//end_oneDot
 
 
@@ -309,13 +268,13 @@ void readbutton() {
     nextPattern();  // Change to the next pattern
 
     //Flash pixel zero white as a visual that button was pressed.
-    leds[0] = CHSV(0, 0, 255); //Set first pixel color white
-    FastLED.show();  //Update display
-    delay(100);  //Short pause so we can see leds[0] flash on
-    leds[0] = CRGB::Black;  //Set first pixel off
-    leds[1] = CRGB::Black;  //Set first pixel off
-    leds[2] = CRGB::Black;  //Set first pixel off
-    FastLED.show();
+    //leds[0] = CHSV(0, 0, 255); //Set first pixel color white
+    //FastLED.show();  //Update display
+    //delay(100);  //Short pause so we can see leds[0] flash on
+    //leds[0] = CRGB::Black;  //Set first pixel off
+    //leds[1] = CRGB::Black;  //Set first pixel off
+    //leds[2] = CRGB::Black;  //Set first pixel off
+    //FastLED.show();
     delay(100);
   }
 }//end_readbutton
@@ -413,69 +372,15 @@ void JsonToFastled(JsonObject obj)
       delay(30);
     }
   }
-  else if (useMode == 2)
-  { // show set instant
-    PrintLn("Mode 2");
-    for (int i = 0; i < NUM_LEDS; i++)
-    {
-      int R = obj[String("LedSequence")][i][0];
-      int G = obj[String("LedSequence")][i][1];
-      int B = obj[String("LedSequence")][i][2];
-      leds[i] = CRGB(R, G, B);
-    }
-    FastLED.show();
-  }
-  else if (useMode == 3)
-  { // show set of colors over whole strip, with interval
-    PrintLn("Mode 3");
-    fullBar(obj, true);
-  }
-  else if (useMode == 4)
-  { // show one led
-    PrintLn("Mode 4");
-    oneLed(obj);
-  }
-  else if (useMode == 5)
-  { // slow showing of set + dimming
-    PrintLn("Mode 5");
-    for (int i = 0; i < NUM_LEDS; i++)
-    {
-      leds[i] = CRGB(0, 0, 0);
-      FastLED.show();
-      delay(30);
-      int R = obj[String("LedSequence")][i][0];
-      int G = obj[String("LedSequence")][i][1];
-      int B = obj[String("LedSequence")][i][2];
-      leds[i] = CRGB(R, G, B);
-      FastLED.show();
-      delay(30);
-    }
-  }
-  else if (useMode == 6)
-  { // fast flash
-    PrintLn("Mode 6");
-    // save current
-    //prevleds = leds; // save previous
-    for (int i = 0; i < 144; i++)
-    {
-      prevleds[i] = leds[i];
-    }
-    fullBar(obj, false);
-    for (int i = 0; i < 144; i++) // take back te previous
-    {
-      leds[i] = prevleds[i];
-    }
-    FastLED.show();
-  }
   else
   {
     PrintLn("Mode Else");
-    leds[0] = CRGB(1, 0, 0); // something is wrong
-    FastLED.show();
-    delay(300);
-    leds[0] = CRGB(0, 0, 0);
-    FastLED.show();
-    delay(300);
+    //leds[0] = CRGB(1, 0, 0); // something is wrong
+    //FastLED.show();
+    ////delay(300);
+    //leds[0] = CRGB(0, 0, 0);
+    //FastLED.show();
+    //delay(300);
   }
 }
 
@@ -550,11 +455,11 @@ void JsonToAction(JsonObject obj)
 }
 
 void showRed() {
-  leds[0] = CRGB(20, 0, 0); // show blinking led when searching for wifi network
-  FastLED.show();
-  delay(1000);
-  leds[0] = CRGB(1, 0, 0); // show blinking led when searching for wifi network
-  FastLED.show();
+  //leds[0] = CRGB(20, 0, 0); // show blinking led when searching for wifi network
+  //FastLED.show();
+  //delay(1000);
+  ////leds[0] = CRGB(1, 0, 0); // show blinking led when searching for wifi network
+  //FastLED.show();
 }
 
 void bpm()
