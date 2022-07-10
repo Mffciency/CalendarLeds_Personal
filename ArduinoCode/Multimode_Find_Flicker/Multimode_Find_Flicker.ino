@@ -34,7 +34,7 @@ Button myButton(buttonPin, true, true, 50);  // Declare the button
 #define COLOR_ORDER GRB
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
-#define BRIGHTNESS          255
+#define BRIGHTNESS          10
 #define FRAMES_PER_SECOND   120
 #define CALENDAR_FPS  3
 
@@ -102,7 +102,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT); // Set LED_PIN as output
   digitalWrite(LED_PIN, LOW); // Set LED_PIN low to turn off build in LED
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(255);
+  FastLED.setBrightness(10);
 
   //fill_solid( leds, NUM_LEDS, CRGB(255,255,200));
   PrintLn("white");
@@ -205,10 +205,10 @@ void Calendar() {
 
 //////////////////////////
 void AllWhite() {
-  fill_solid( leds, NUM_LEDS, CRGB(255, 255, 200)); //GRB
-  EVERY_N_MILLISECONDS(3000) {
-    leds[0] = CRGB(200, 200, 50);
-  }
+  fill_solid( leds, NUM_LEDS, CRGB(5, 5, 4)); //GRB
+  //EVERY_N_MILLISECONDS(3000) {
+  //  leds[0] = CRGB(2, 2, 1);
+  //}
 }
 
 //////////////////////////
