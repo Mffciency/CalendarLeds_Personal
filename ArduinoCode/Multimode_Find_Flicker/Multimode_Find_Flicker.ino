@@ -1,5 +1,5 @@
 //***************************************************************
-// Current working version of the ledstrip
+// Finding how to solve the flickering of the ledstrip
 //
 // Search for "button" to find the various button related
 // code additions.
