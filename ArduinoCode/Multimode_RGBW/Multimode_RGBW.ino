@@ -159,9 +159,10 @@ void loop()
   //*
   readbutton();  // check for button press
   //*/
-  if (pressed || currentPattern == 2 || currentPattern == 3)
+  if (pressed || currentPattern != 1)
   {
     PrintLn("Pressed function");
+    PrintLn(String(currentPattern));
     if (currentPattern == 1)
     {
       PrintLn("White");
@@ -206,8 +207,8 @@ void Calendar() {
 void fillWhite() {
   int count = 0;
   for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
-    leds[i] = CRGBW(0, 0, 0, 25);
-    leds[i-(count*2)] = CRGBW(0, 0, 0, 25);
+    leds[i] = CRGBW(0, 0, 0, 255);
+    leds[i-(count*2)] = CRGBW(0, 0, 0, 255);
     //*
     if (i+2 < NUM_LEDS)
     {
@@ -227,7 +228,7 @@ void fillWhite() {
     //*/
     count = count + 1;
     FastLED.show();
-    delay(5);
+    delay(15);
   }
   EVERY_N_MILLISECONDS(3000) {
     leds[0] = CRGB(200, 200, 50);
@@ -289,7 +290,7 @@ void readbutton() {
     currentPattern = (currentPattern + 1); 
     PrintLn(String(currentPattern));
     
-    if (currentPattern >= NUM_PATTERNS) {
+    if (currentPattern > NUM_PATTERNS) {
       currentPattern = 0;
     }
     //Flash pixel zero white as a visual that button was pressed.
