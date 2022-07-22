@@ -12,9 +12,7 @@
 // This uses JChristensen's Button Library from:
 //   https://github.com/JChristensen/JC_Button
 
-#ifdef ESP8266
-#define FASTLED_ALLOW_INTERRUPTS 0                            // Used for ESP8266 with WS2812 LED's. Ugh!!!
-#endif
+
 
 #include "WifiLib.h"
 #include <ESP8266WiFi.h>
@@ -42,8 +40,6 @@ bool pressed = true;
 #define NUM_LEDS    144
 CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          255
-#define FRAMES_PER_SECOND   120
-#define CALENDAR_FPS  3
 
 CRGB prevleds[NUM_LEDS];
 
@@ -81,7 +77,7 @@ uint8_t i = 0, j = 0;
 
 // general setup --------------------------------------------------------------
 bool crashed = false;
-bool showUpdates = true;
+bool showUpdates = false;
 
 // Functions -----------------------------------------------------------
 void PrintLn(String text)
@@ -172,13 +168,9 @@ void loop()
       PrintLn("Calendar");
       Calendar();  
     }
-    else
+    else if (currentPattern == 3)
     {
-      PrintLn("Red");
-      fillRed();
-      delay(200);
-      fillBlack();
-      delay(200);
+      runRed();      
     }
     pressed = false;
   }
@@ -241,8 +233,9 @@ void fillBlack(){
     leds[i-(count*2)] = CRGB(0, 0, 0);
     count = count + 1;
     FastLED.show();
-    delay(30);
+    delay(15);
   }
+  delay(200);
 }
 
 void fillRed(){
@@ -250,17 +243,17 @@ void fillRed(){
   for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
     leds[i] = CRGB(10, 0, 0);
     leds[i-(count*2)] = CRGB(10, 0, 0);
-    if (i+2 > NUM_LEDS)
+    if (i+2 < NUM_LEDS)
     {
       leds[i+2] = CRGB(4, 0, 0);
       leds[i-(count*2)-2] = CRGB(4, 0, 0);
     }
-    if (i+4 > NUM_LEDS)
+    if (i+4 < NUM_LEDS)
     {
       leds[i+4] = CRGB(2, 0, 0);
       leds[i-(count*2)-4] = CRGB(2, 0, 0);
     }
-    if (i+6 > NUM_LEDS)
+    if (i+6 < NUM_LEDS)
     {
       leds[i+6] = CRGB(1, 0, 0);
       leds[i-(count*2)-6] = CRGB(1, 0, 0);
@@ -269,8 +262,16 @@ void fillRed(){
     FastLED.show();
     delay(30);
   }
+  delay(200);
 }
-
+ void runRed()
+ {
+  EVERY_N_MILLISECONDS(3000) {
+    PrintLn("Red");
+    fillRed();
+    fillBlack();
+  }
+ }
 //---------------------------------------------------------------
 
 //---------Function to read the button and do something----------
@@ -290,7 +291,7 @@ void readbutton() {
     PrintLn(String(currentPattern));
     
     if (currentPattern > NUM_PATTERNS) {
-      currentPattern = 0;
+      currentPattern = 1;
     }
     //Flash pixel zero white as a visual that button was pressed.
     leds[0] = CRGB(20, 20, 0); //Set first pixel color white

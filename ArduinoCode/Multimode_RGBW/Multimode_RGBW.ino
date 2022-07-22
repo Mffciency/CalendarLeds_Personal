@@ -251,17 +251,17 @@ void fillRed(){
   for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
     leds[i] = CRGB(10, 0, 0);
     leds[i-(count*2)] = CRGB(10, 0, 0);
-    if (i+2 > NUM_LEDS)
+    if (i+2 < NUM_LEDS)
     {
       leds[i+2] = CRGB(4, 0, 0);
       leds[i-(count*2)-2] = CRGB(4, 0, 0);
     }
-    if (i+4 > NUM_LEDS)
+    if (i+4 < NUM_LEDS)
     {
       leds[i+4] = CRGB(2, 0, 0);
       leds[i-(count*2)-4] = CRGB(2, 0, 0);
     }
-    if (i+6 > NUM_LEDS)
+    if (i+6 < NUM_LEDS)
     {
       leds[i+6] = CRGB(1, 0, 0);
       leds[i-(count*2)-6] = CRGB(1, 0, 0);
@@ -291,7 +291,7 @@ void readbutton() {
     PrintLn(String(currentPattern));
     
     if (currentPattern > NUM_PATTERNS) {
-      currentPattern = 0;
+      currentPattern = 1;
     }
     //Flash pixel zero white as a visual that button was pressed.
     leds[0] = CRGB(20, 20, 0); //Set first pixel color white
