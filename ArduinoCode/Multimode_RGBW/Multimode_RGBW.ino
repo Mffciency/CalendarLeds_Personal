@@ -29,7 +29,10 @@ Button myButton(buttonPin, true, true, 50);  // Declare the button
 // Fastled setup -------------------------------------------------------
 
 #define LED_PIN    0 // =GPIO0 = D3
-
+bool beginning = true;
+int NUM_PATTERNS = 3;
+int currentPattern = 1;
+bool pressed = true;
 
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
@@ -107,7 +110,6 @@ void setup() {
   FastLED.setBrightness(255);
 
   //fill_solid( leds, NUM_LEDS, CRGB(255,255,200));
-  PrintLn("white");
   FastLED.clear();
 
   myButton.begin();  // initialize the button object
@@ -118,19 +120,23 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED)
   {
+    //*
     delay(1000);
-    leds[0] = CRGB(20, 20, 20); // show blinking led when searching for wifi network
+    leds[0] = CRGB(10, 0, 0); // show blinking led when searching for wifi network
     FastLED.show();
     Print(".");
     delay(1000);
-    leds[0] = CRGB(50, 100, 150);
+    leds[0] = CRGB(0, 0, 0);
     FastLED.show();
+    //*/
   }
+  fillBlack();
   PrintLn("");
   PrintLn("Connected");
+  /*
   leds[0] = CRGB(0, 50, 0); // show green led when connected to wifi
   FastLED.show();
-
+  */
   // do a first call to the website to get the led sequence
   setWebsite(1);
   //CallWebsite();
@@ -140,7 +146,7 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { AllWhite, Calendar, oneDot, confetti_GB };
+SimplePatternList gPatterns = { Calendar, AllWhite, Calendar, oneDot, confetti };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -149,11 +155,42 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 //---------------------------------------------------------------
 void loop()
 {
-  // BUTTON STUFF
-  // Not using this timer to change patterns any more.  Instead check the button.
-  //   EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
+  if (beginning)
+  {
+    fillBlack();
+    leds[0] = CRGB(0, 0, 0);
+    FastLED.show();
+    beginning = false;  
+  }
+  //*
   readbutton();  // check for button press
+  //*/
+  if (pressed || currentPattern == 1)
+  {
+    PrintLn("Pressed function");
+    if (currentPattern == 1)
+    {
+      PrintLn("Calendar");
+      Calendar();
+    }
+    else if (currentPattern == 2)
+    {
+      PrintLn("White");
+      fillBlack();
+      AllWhite();
+    }
+    else
+    {
+    PrintLn("Red");
+    fillRed();
+    rainbow();
+    }
+    pressed = false;
+  }
+  
+  
 
+  /*
   // Call the current pattern function once, updating the 'leds' array
   gPatterns[gCurrentPatternNumber]();
   //leds[0] = CRGB(0, 0, 0); // kill the first led when connected to wifi
@@ -168,31 +205,16 @@ void loop()
   {
     FastLED.delay(1000 / CALENDAR_FPS);
   }
+  //*/
+  //Calendar();
+
 }//end_main_loop
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 
 //---------------------------------------------------------------
-void nextPattern()
-{
-  // add one to the current pattern number, and wrap around at the end
-  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
-  if (gCurrentPatternNumber != 0) // not calendar
-  {
-    FastLED.setBrightness(BRIGHTNESS);
-  }
-  else // calendar
-  {
-    FastLED.clear();
-    //leds[0] = CRGB(50, 0, 0); // show green led when connected to wifi
-    FastLED.show();
-    FastLED.setBrightness(255);;
-  }
-  Serial.println(gCurrentPatternNumber);
-}
 
-//////////////////////////
 void Calendar() {
   int ref = 60 / refreshRate;
   EVERY_N_SECONDS(ref) {
@@ -205,15 +227,14 @@ void Calendar() {
   }
 }
 
-//////////////////////////
 void AllWhite() {
   for(int i = 0; i < NUM_LEDS; i++){
     leds[i] = CRGBW(0, 0, 0, 255);
     FastLED.show();
-    //delay(10);
+    delay(5);
   }
   EVERY_N_MILLISECONDS(3000) {
-    leds[0] = CRGB(200, 200, 50);
+    //leds[0] = CRGB(200, 200, 50);
   }
 }
 
@@ -249,24 +270,8 @@ void confetti()
 
 
 //////////////////////////
-void confetti_GB()
-{
-  // random colored speckles, Green and Blue hues only
-  // Green = 96, Blue = 160
-  uint8_t p = 25;  // What percentage of the time to make speckles.  [Range 0-100]
 
-//  fadeToBlackBy( leds, NUM_LEDS, 10);
-  if (random8(100) < p) {
-    int pos = random16(NUM_LEDS);
-    uint8_t hue = random8(2);  // randomly chooses a 0 or 1
-    if (hue == 0) {
-      hue = random8(92, 111); // pick a hue somewhere in the green zone
-    } else {
-      hue = random8(156, 165); // pick a hue somewhere in the blue zone
-    }
-//    leds[pos] += CHSV( hue, random8(200, 240), 255);
-  }
-}//end confetti_GB
+
 
 
 //////////////////////////
@@ -299,7 +304,21 @@ void oneDot() {
   }
 }//end_oneDot
 
+void fillBlack(){
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGBW(0, 0, 0, 0);
+    FastLED.show();
+    delay(5);
+  }
+}
 
+void fillRed(){
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGBW(20, 0, 0, 0);
+    FastLED.show();
+    delay(5);
+  }
+}
 
 //---------------------------------------------------------------
 
@@ -314,16 +333,22 @@ void readbutton() {
   myButton.read();
   if (myButton.wasPressed()) {
     Serial.println("Button pressed!  Next pattern...   ");
-    nextPattern();  // Change to the next pattern
-
+    //nextPattern();  // Change to the next pattern
+    pressed = true;
+    currentPattern = (currentPattern + 1); 
+    Serial.println(currentPattern);
+    
+    if (currentPattern >= NUM_PATTERNS) {
+      currentPattern = 0;
+    }
     //Flash pixel zero white as a visual that button was pressed.
     //leds[0] = CHSV(0, 0, 255); //Set first pixel color white
-    FastLED.show();  //Update display
-    delay(100);  //Short pause so we can see leds[0] flash on
-    leds[0] = CRGB::Black;  //Set first pixel off
-    leds[1] = CRGB::Black;  //Set first pixel off
-    leds[2] = CRGB::Black;  //Set first pixel off
-    FastLED.show();
+    //FastLED.show();  //Update display
+    //delay(100);  //Short pause so we can see leds[0] flash on
+    //leds[0] = CRGB::Black;  //Set first pixel off
+    //leds[1] = CRGB::Black;  //Set second pixel off
+    //leds[2] = CRGB::Black;  //Set third pixel off
+    //FastLED.show();
     delay(100);
   }
 }//end_readbutton
@@ -478,12 +503,14 @@ void JsonToFastled(JsonObject obj)
   else
   {
     PrintLn("Mode Else");
+    /*
     leds[0] = CRGB(1, 0, 0); // something is wrong
     FastLED.show();
     delay(300);
     leds[0] = CRGB(0, 0, 0);
     FastLED.show();
     delay(300);
+    */
   }
 }
 
@@ -558,21 +585,11 @@ void JsonToAction(JsonObject obj)
 }
 
 void showRed() {
+  /*
   leds[0] = CRGB(20, 0, 0); // show blinking led when searching for wifi network
   FastLED.show();
   delay(1000);
   leds[0] = CRGB(1, 0, 0); // show blinking led when searching for wifi network
   FastLED.show();
-}
-
-void bpm()
-{
-  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
-  uint8_t BeatsPerMinute = 62;
-  CRGBPalette16 palette = PartyColors_p;
-  uint8_t beat = beatsin8(BeatsPerMinute, 64, 255);
-  for (int i = 0; i < NUM_LEDS; i++)
-  { //9948
-    leds[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
-  }
+  */
 }
