@@ -12,6 +12,10 @@
 // This uses JChristensen's Button Library from:
 //   https://github.com/JChristensen/JC_Button
 
+#ifdef ESP8266
+#define FASTLED_ALLOW_INTERRUPTS 0                            // Used for ESP8266 with WS2812 LED's. Ugh!!!
+#endif
+
 #include "WifiLib.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -144,14 +148,6 @@ void setup() {
 }
 
 
-// List of patterns to cycle through.  Each is defined as a separate function below.
-typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { Calendar, AllWhite, Calendar, oneDot, confetti };
-
-uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
-
-
 //---------------------------------------------------------------
 void loop()
 {
@@ -171,7 +167,7 @@ void loop()
     if (currentPattern == 1)
     {
       PrintLn("Calendar");
-      Calendar();
+      Calendar();     
     }
     else if (currentPattern == 2)
     {
@@ -183,31 +179,9 @@ void loop()
     {
     PrintLn("Red");
     fillRed();
-    rainbow();
     }
     pressed = false;
   }
-  
-  
-
-  /*
-  // Call the current pattern function once, updating the 'leds' array
-  gPatterns[gCurrentPatternNumber]();
-  //leds[0] = CRGB(0, 0, 0); // kill the first led when connected to wifi
-  // send the 'leds' array out to the actual LED strip
-  FastLED.show();
-  // insert a delay to keep the framerate modest
-  if (gCurrentPatternNumber != 0) // not calendar
-  {
-    FastLED.delay(1000 / FRAMES_PER_SECOND);
-  }
-  else // calendar
-  {
-    FastLED.delay(1000 / CALENDAR_FPS);
-  }
-  //*/
-  //Calendar();
-
 }//end_main_loop
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
@@ -218,12 +192,16 @@ void loop()
 void Calendar() {
   int ref = 60 / refreshRate;
   EVERY_N_SECONDS(ref) {
-    Serial.println("Refreshrate");
-    Serial.println(ref);
+    PrintLn("Refreshrate");
+    PrintLn(String(ref));
     if (!crashed) {
       setWebsite(1);
     }
+    leds[0] = CRGBW(0, 0, 0, 0);
+    FastLED.show();
     CallWebsite();
+    leds[0] = CRGBW(0, 0, 0, 0);
+    FastLED.show();
   }
 }
 
@@ -237,72 +215,6 @@ void AllWhite() {
     //leds[0] = CRGB(200, 200, 50);
   }
 }
-
-//////////////////////////
-void rainbow(){
-  long millisIn = millis();
-  long loopTime = 5000; // 5 seconds
-
-  while(millis() < millisIn + loopTime){
-    rainbow();
-    delay(5);
-  }
-}
-
-void rainbow_base(){
-  static uint8_t hue;
-
-  for(int i = 0; i < NUM_LEDS; i++){
-    leds[i] = CHSV((i * 256 / NUM_LEDS) + hue, 255, 255);
-  }
-  FastLED.show();
-  hue++;
-}
-
-//////////////////////////
-void confetti()
-{
-  // random colored speckles that blink in and fade smoothly
-  //fadeToBlackBy( leds, NUM_LEDS, 20);
-  int pos = random16(NUM_LEDS);
-//  leds[pos] += CHSV( gHue + 10 + random8(12), random8(128, 200), random8(48, 255));
-}
-
-
-//////////////////////////
-
-
-
-
-//////////////////////////
-void juggle() {
-  // four colored dots, weaving in and out of sync with each other
-//  fadeToBlackBy( leds, NUM_LEDS, 20);
-  byte dothue = 0;
-  for ( int i = 0; i < 4; i++) {
-    //leds[beatsin16( i + 5, 0, NUM_LEDS - 1 )] |= CHSV(dothue, 200, 255);
-    dothue += 32;
-  }
-}
-
-
-//////////////////////////
-void oneDot() {
-
-  static uint8_t pos;  //used to keep track of position
-  EVERY_N_MILLISECONDS(20) {
-//    fadeToBlackBy( leds, NUM_LEDS, 200);  //fade all the pixels some
-    //leds[pos] = CHSV(gHue, random8(0, 25), 255);
-    //leds[(pos+5) % NUM_LEDS] = CHSV(gHue+64, random8(170,230), 255);
-    pos = pos + 1;  //advance position
-
-    //This following check is very important.  Do not go past the last pixel!
-    if (pos == NUM_LEDS) {
-      pos = 0;  //reset to beginning
-    }
-    //Trying to write data to non-existent pixels causes bad things.
-  }
-}//end_oneDot
 
 void fillBlack(){
   for(int i = 0; i < NUM_LEDS; i++){
@@ -332,17 +244,17 @@ void fillRed(){
 void readbutton() {
   myButton.read();
   if (myButton.wasPressed()) {
-    Serial.println("Button pressed!  Next pattern...   ");
+    PrintLn("Button pressed!  Next pattern...   ");
     //nextPattern();  // Change to the next pattern
     pressed = true;
     currentPattern = (currentPattern + 1); 
-    Serial.println(currentPattern);
+    PrintLn(String(currentPattern));
     
     if (currentPattern >= NUM_PATTERNS) {
       currentPattern = 0;
     }
     //Flash pixel zero white as a visual that button was pressed.
-    //leds[0] = CHSV(0, 0, 255); //Set first pixel color white
+    leds[0] = CRGBW(20, 20, 0, 0); //Set first pixel color white
     //FastLED.show();  //Update display
     //delay(100);  //Short pause so we can see leds[0] flash on
     //leds[0] = CRGB::Black;  //Set first pixel off
@@ -442,9 +354,13 @@ void JsonToFastled(JsonObject obj)
       int G = obj[String("LedSequence")][i][1];
       int B = obj[String("LedSequence")][i][2];
       leds[i] = CRGB(R, G, B);
+      leds[0] = CRGB(1, 0, 0);
       FastLED.show();
       delay(30);
     }
+    leds[0] = CRGB(0, 0, 0);
+    FastLED.show();
+    delay(30);
   }
   else if (useMode == 2)
   { // show set instant
@@ -457,6 +373,9 @@ void JsonToFastled(JsonObject obj)
       leds[i] = CRGB(R, G, B);
     }
     FastLED.show();
+    leds[0] = CRGB(0, 0, 0);
+    FastLED.show();
+    delay(30);
   }
   else if (useMode == 3)
   { // show set of colors over whole strip, with interval
@@ -503,14 +422,14 @@ void JsonToFastled(JsonObject obj)
   else
   {
     PrintLn("Mode Else");
-    /*
+    //*
     leds[0] = CRGB(1, 0, 0); // something is wrong
     FastLED.show();
     delay(300);
     leds[0] = CRGB(0, 0, 0);
     FastLED.show();
     delay(300);
-    */
+    //*/
   }
 }
 
@@ -537,10 +456,6 @@ void fullBar(JsonObject obj, bool slow)
       delay(interval);
     }
   }
-  //Serial.print("leds: ");
-  //Serial.print(leds[0][0]);
-  //Serial.print(leds[0][1]);
-  //Serial.println(leds[0][2]);
 }
 
 void oneLed(JsonObject obj)
