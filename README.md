@@ -14,7 +14,7 @@ led #144 = 00:00 - 00:09
 
 
 Items used:
-- ESP8266 node mcu
+- ESP8266 node mcu 1.0
 - WS2812B, 144leds, 1m
 - Aluminium V profile with diffuser
 - Wires
