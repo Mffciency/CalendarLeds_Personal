@@ -81,8 +81,6 @@ int useMode = mode;
 uint8_t Ary[432];
 uint8_t i = 0, j = 0;
 
-#define ARRAY_SIZE(array) ((sizeof(array)) / (sizeof(array[0])))
-
 // general setup --------------------------------------------------------------
 bool crashed = false;
 bool showUpdates = true;
@@ -112,9 +110,9 @@ void setup() {
   digitalWrite(LED_PIN, LOW); // Set LED_PIN low to turn off build in LED
   FastLED.addLeds<WS2812B, LED_PIN, RGB>(ledsRGB, getRGBWsize(NUM_LEDS));
   FastLED.setBrightness(255);
-
-  //fill_solid( leds, NUM_LEDS, CRGB(255,255,200));
   FastLED.clear();
+  fillWhite();
+  
 
   myButton.begin();  // initialize the button object
 
@@ -134,13 +132,13 @@ void setup() {
     FastLED.show();
     //*/
   }
-  fillBlack();
+  //fillBlack();
   PrintLn("");
   PrintLn("Connected");
-  /*
+  //*
   leds[0] = CRGB(0, 50, 0); // show green led when connected to wifi
   FastLED.show();
-  */
+  //*/
   // do a first call to the website to get the led sequence
   setWebsite(1);
   //CallWebsite();
@@ -153,7 +151,7 @@ void loop()
 {
   if (beginning)
   {
-    fillBlack();
+    //fillBlack();
     leds[0] = CRGB(0, 0, 0);
     FastLED.show();
     beginning = false;  
@@ -161,19 +159,18 @@ void loop()
   //*
   readbutton();  // check for button press
   //*/
-  if (pressed || currentPattern == 1)
+  if (pressed || currentPattern == 2)
   {
     PrintLn("Pressed function");
     if (currentPattern == 1)
     {
-      PrintLn("Calendar");
-      Calendar();     
+      PrintLn("White");
+      fillWhite();   
     }
     else if (currentPattern == 2)
     {
-      PrintLn("White");
-      fillBlack();
-      AllWhite();
+      PrintLn("Calendar");
+      Calendar();  
     }
     else
     {
@@ -183,8 +180,6 @@ void loop()
     pressed = false;
   }
 }//end_main_loop
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 
 //---------------------------------------------------------------
@@ -205,14 +200,15 @@ void Calendar() {
   }
 }
 
-void AllWhite() {
+void fillWhite() {
+  int count = 0;
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[i] = CRGBW(0, 0, 0, 255);
+    leds[i] = CRGBW(0, 0, 0, 25);
     FastLED.show();
     delay(5);
   }
   EVERY_N_MILLISECONDS(3000) {
-    //leds[0] = CRGB(200, 200, 50);
+    leds[0] = CRGB(200, 200, 50);
   }
 }
 
@@ -254,13 +250,13 @@ void readbutton() {
       currentPattern = 0;
     }
     //Flash pixel zero white as a visual that button was pressed.
-    leds[0] = CRGBW(20, 20, 0, 0); //Set first pixel color white
-    //FastLED.show();  //Update display
-    //delay(100);  //Short pause so we can see leds[0] flash on
-    //leds[0] = CRGB::Black;  //Set first pixel off
-    //leds[1] = CRGB::Black;  //Set second pixel off
-    //leds[2] = CRGB::Black;  //Set third pixel off
-    //FastLED.show();
+    leds[0] = CRGB(20, 20, 0); //Set first pixel color white
+    FastLED.show();  //Update display
+    delay(100);  //Short pause so we can see leds[0] flash on
+    leds[0] = CRGB(0, 0, 0);  //Set first pixel off
+    leds[1] = CRGB(0, 0, 0);  //leds[1] = CRGB::Black;  //Set second pixel off
+    leds[2] = CRGB(0, 0, 0);  //Set third pixel off
+    FastLED.show();
     delay(100);
   }
 }//end_readbutton
