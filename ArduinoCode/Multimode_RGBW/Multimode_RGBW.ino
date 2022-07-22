@@ -159,7 +159,7 @@ void loop()
   //*
   readbutton();  // check for button press
   //*/
-  if (pressed || currentPattern == 2)
+  if (pressed || currentPattern == 2 || currentPattern == 3)
   {
     PrintLn("Pressed function");
     if (currentPattern == 1)
@@ -174,8 +174,11 @@ void loop()
     }
     else
     {
-    PrintLn("Red");
-    fillRed();
+      PrintLn("Red");
+      fillRed();
+      delay(200);
+      fillBlack();
+      delay(200);
     }
     pressed = false;
   }
@@ -192,18 +195,37 @@ void Calendar() {
     if (!crashed) {
       setWebsite(1);
     }
-    leds[0] = CRGBW(0, 0, 0, 0);
+    leds[0] = CRGB(0, 0, 0);
     FastLED.show();
     CallWebsite();
-    leds[0] = CRGBW(0, 0, 0, 0);
+    leds[0] = CRGB(0, 0, 0);
     FastLED.show();
   }
 }
 
 void fillWhite() {
   int count = 0;
-  for(int i = 0; i < NUM_LEDS; i++){
+  for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
     leds[i] = CRGBW(0, 0, 0, 25);
+    leds[i-(count*2)] = CRGBW(0, 0, 0, 25);
+    //*
+    if (i+2 < NUM_LEDS)
+    {
+      leds[i+2] = CRGBW(0, 0, 0, 6);
+      leds[i-(count*2)-2] = CRGBW(0, 0, 0, 6);
+    }
+    if (i+4 < NUM_LEDS)
+    {
+      leds[i+4] = CRGBW(0, 0, 0, 2);
+      leds[i-(count*2)-4] = CRGBW(0, 0, 0, 2);
+    }
+    if (i+6 < NUM_LEDS)
+    {
+      leds[i+6] = CRGBW(0, 0, 0, 1);
+      leds[i-(count*2)-6] = CRGBW(0, 0, 0, 1);
+    }
+    //*/
+    count = count + 1;
     FastLED.show();
     delay(5);
   }
@@ -213,18 +235,39 @@ void fillWhite() {
 }
 
 void fillBlack(){
-  for(int i = 0; i < NUM_LEDS; i++){
-    leds[i] = CRGBW(0, 0, 0, 0);
+  int count = 0;
+  for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
+    leds[i] = CRGB(0, 0, 0);
+    leds[i-(count*2)] = CRGB(0, 0, 0);
+    count = count + 1;
     FastLED.show();
-    delay(5);
+    delay(30);
   }
 }
 
 void fillRed(){
-  for(int i = 0; i < NUM_LEDS; i++){
-    leds[i] = CRGBW(20, 0, 0, 0);
+  int count = 0;
+  for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
+    leds[i] = CRGB(10, 0, 0);
+    leds[i-(count*2)] = CRGB(10, 0, 0);
+    if (i+2 > NUM_LEDS)
+    {
+      leds[i+2] = CRGB(4, 0, 0);
+      leds[i-(count*2)-2] = CRGB(4, 0, 0);
+    }
+    if (i+4 > NUM_LEDS)
+    {
+      leds[i+4] = CRGB(2, 0, 0);
+      leds[i-(count*2)-4] = CRGB(2, 0, 0);
+    }
+    if (i+6 > NUM_LEDS)
+    {
+      leds[i+6] = CRGB(1, 0, 0);
+      leds[i-(count*2)-6] = CRGB(1, 0, 0);
+    }
+    count = count + 1;
     FastLED.show();
-    delay(5);
+    delay(30);
   }
 }
 
