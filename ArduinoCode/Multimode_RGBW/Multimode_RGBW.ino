@@ -83,7 +83,7 @@ uint8_t i = 0, j = 0;
 
 // general setup --------------------------------------------------------------
 bool crashed = false;
-bool showUpdates = true;
+bool showUpdates = false;
 
 // Functions -----------------------------------------------------------
 void PrintLn(String text)
