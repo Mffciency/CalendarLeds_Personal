@@ -199,6 +199,7 @@ void fillWhite() {
   int count = 0;
   for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
     leds[i] = CRGB(255,255,200);
+    //leds[i] = CRGB(25,20,0);
     leds[i-(count*2)] = CRGB(255,255,200);
     //*
     if (i+2 < NUM_LEDS)
@@ -241,8 +242,8 @@ void fillBlack(){
 void fillRed(){
   int count = 0;
   for(int i = NUM_LEDS/2; i < NUM_LEDS; i++){
-    leds[i] = CRGB(10, 0, 0);
-    leds[i-(count*2)] = CRGB(10, 0, 0);
+    leds[i] = CRGB(25, 20, 0);
+    leds[i-(count*2)] = CRGB(25, 20, 0);
     if (i+2 < NUM_LEDS)
     {
       leds[i+2] = CRGB(4, 0, 0);
@@ -262,11 +263,11 @@ void fillRed(){
     FastLED.show();
     delay(30);
   }
-  delay(200);
+  //delay(200);
 }
  void runRed()
  {
-  EVERY_N_MILLISECONDS(3000) {
+  EVERY_N_MILLISECONDS(5000) {
     PrintLn("Red");
     fillRed();
     fillBlack();
@@ -298,7 +299,7 @@ void readbutton() {
     FastLED.show();  //Update display
     delay(100);  //Short pause so we can see leds[0] flash on
     leds[0] = CRGB(0, 0, 0);  //Set first pixel off
-    leds[1] = CRGB(0, 0, 0);  //leds[1] = CRGB::Black;  //Set second pixel off
+    leds[1] = CRGB(0, 10, 0);  //leds[1] = CRGB::Black;  //Set second pixel green
     leds[2] = CRGB(0, 0, 0);  //Set third pixel off
     FastLED.show();
     delay(100);
